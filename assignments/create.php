@@ -3,7 +3,7 @@ require_once __DIR__ . '/../config.php';
 require_login();
 
 $user = current_user();
-$class_id = $_GET['class_id'] ?? null;
+$class_id = filter_input(INPUT_GET, 'class_id', FILTER_VALIDATE_INT);
 
 if (!$class_id) {
     die('Class not found.');
@@ -50,7 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header('Location: /Uni-Team-Project/google-classroom-clone-2/classes/classwork.php?class_id=' . $class_id);
             exit;
         } catch (PDOException $e) {
-            $errors[] = 'Database error: ' . $e->getMessage();
+            error_log('Assignment creation error: ' . $e->getMessage());
+            $errors[] = 'A system error occurred. Please try again later.';
         }
     }
 }
@@ -169,6 +170,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php endif; ?>
 
                 <form method="POST">
+                    <?php echo csrf_input(); ?>
                     <div class="form-group">
                         <label for="title">Title *</label>
                         <input type="text" id="title" name="title" required value="<?php echo htmlspecialchars($_POST['title'] ?? ''); ?>" placeholder="e.g., Web Design Project">
@@ -186,7 +188,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <div class="button-group">
                         <button type="submit" class="submit-btn">Create Assignment</button>
-                        <a href="/Uni-Team-Project/google-classroom-clone-2/classes/classwork.php?class_id=<?php echo $class_id; ?>" class="cancel-btn" style="text-align: center; display: flex; align-items: center; justify-content: center; text-decoration: none;">Cancel</a>
+                        <a href="/Uni-Team-Project/google-classroom-clone-2/classes/classwork.php?class_id=<?php echo (int)$class_id; ?>" class="cancel-btn" style="text-align: center; display: flex; align-items: center; justify-content: center; text-decoration: none;">Cancel</a>
                     </div>
                 </form>
             </div>

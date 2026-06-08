@@ -37,7 +37,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $errors[] = 'Email already registered.';
             }
         } catch (PDOException $e) {
-            $errors[] = 'Database error: ' . $e->getMessage();
+            error_log('Registration check error: ' . $e->getMessage());
+            $errors[] = 'A system error occurred. Please try again later.';
         }
     }
 
@@ -51,7 +52,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Redirect to login after 2 seconds
             echo '<meta http-equiv="refresh" content="2; url=login.php">';
         } catch (PDOException $e) {
-            $errors[] = 'Database error: ' . $e->getMessage();
+            error_log('Registration insert error: ' . $e->getMessage());
+            $errors[] = 'A system error occurred. Please try again later.';
         }
     }
 }
@@ -176,6 +178,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
 
         <form method="POST">
+            <?php echo csrf_input(); ?>
             <div class="form-group">
                 <label for="name">Full Name</label>
                 <input type="text" id="name" name="name" required value="<?php echo htmlspecialchars($_POST['name'] ?? ''); ?>">

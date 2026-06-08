@@ -22,7 +22,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($user && password_verify($password, $user['password'])) {
-                // Login successful
+                // Regenerate session ID to prevent session fixation
+                session_regenerate_id(true);
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user'] = [
                     'id' => $user['id'],
@@ -30,13 +31,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'email' => $user['email'],
                     'role' => $user['role']
                 ];
-                header('Location: /Uni-Team-Project/google-classroom-clone-2/home/dashboard.php');
+                header('Location: /home/dashboard.php');
                 exit;
             } else {
                 $errors[] = 'Invalid email or password.';
             }
         } catch (PDOException $e) {
-            $errors[] = 'Database error: ' . $e->getMessage();
+            error_log('Login error: ' . $e->getMessage());
+            $errors[] = 'A system error occurred. Please try again later.';
         }
     }
 }
@@ -148,6 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
 
         <form method="POST">
+            <?php echo csrf_input(); ?>
             <div class="form-group">
                 <label for="email">Email Address</label>
                 <input type="email" id="email" name="email" required value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">

@@ -3,8 +3,8 @@ require_once __DIR__ . '/../config.php';
 require_login();
 
 $user = current_user();
-$assignment_id = $_GET['assignment_id'] ?? null;
-$class_id = $_GET['class_id'] ?? null;
+$assignment_id = filter_input(INPUT_GET, 'assignment_id', FILTER_VALIDATE_INT);
+$class_id = filter_input(INPUT_GET, 'class_id', FILTER_VALIDATE_INT);
 
 if (!$assignment_id || !$class_id) {
     die('Invalid request.');
@@ -60,7 +60,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header('Location: /Uni-Team-Project/google-classroom-clone-2/classes/classwork.php?class_id=' . $class_id);
             exit;
         } catch (PDOException $e) {
-            $errors[] = 'Database error: ' . $e->getMessage();
+            error_log('Submission error: ' . $e->getMessage());
+            $errors[] = 'A system error occurred. Please try again later.';
         }
     }
 }
@@ -235,6 +236,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php endif; ?>
 
                     <form method="POST">
+                        <?php echo csrf_input(); ?>
                         <div class="form-group">
                             <label for="content">Your Submission</label>
                             <textarea id="content" name="content" required placeholder="Type your answer or paste your work here..."><?php echo htmlspecialchars($_POST['content'] ?? ($submission['content'] ?? '')); ?></textarea>
@@ -242,7 +244,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         <div class="button-group">
                             <button type="submit" class="submit-btn">Submit Assignment</button>
-                            <a href="/Uni-Team-Project/google-classroom-clone-2/classes/classwork.php?class_id=<?php echo $class_id; ?>" class="cancel-btn">Cancel</a>
+                            <a href="/Uni-Team-Project/google-classroom-clone-2/classes/classwork.php?class_id=<?php echo (int)$class_id; ?>" class="cancel-btn">Cancel</a>
                         </div>
                     </form>
                 </div>

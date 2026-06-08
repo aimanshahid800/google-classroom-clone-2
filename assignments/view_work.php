@@ -3,8 +3,8 @@ require_once __DIR__ . '/../config.php';
 require_login();
 
 $user = current_user();
-$assignment_id = $_GET['assignment_id'] ?? null;
-$class_id = $_GET['class_id'] ?? null;
+$assignment_id = filter_input(INPUT_GET, 'assignment_id', FILTER_VALIDATE_INT);
+$class_id = filter_input(INPUT_GET, 'class_id', FILTER_VALIDATE_INT);
 
 if (!$assignment_id || !$class_id) {
     die('Invalid request.');
@@ -51,16 +51,21 @@ $stmt = $pdo->prepare('
 $stmt->execute([$class_id]);
 $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Mark submission as done
+// Mark submission as done (validate that submission belongs to this assignment)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_done'])) {
-    $submission_id = $_POST['submission_id'];
-    try {
-        $stmt = $pdo->prepare('UPDATE submissions SET status = ? WHERE id = ?');
-        $stmt->execute(['done', $submission_id]);
-        header('Location: view_work.php?assignment_id=' . $assignment_id . '&class_id=' . $class_id);
-        exit;
-    } catch (PDOException $e) {
-        $error = 'Error updating submission: ' . $e->getMessage();
+    $submission_id = filter_var($_POST['submission_id'] ?? '', FILTER_VALIDATE_INT);
+    if (!$submission_id) {
+        $error = 'Invalid submission.';
+    } else {
+        try {
+            $stmt = $pdo->prepare('UPDATE submissions SET status = ? WHERE id = ? AND assignment_id = ?');
+            $stmt->execute(['done', $submission_id, $assignment_id]);
+            header('Location: view_work.php?assignment_id=' . $assignment_id . '&class_id=' . $class_id);
+            exit;
+        } catch (PDOException $e) {
+            error_log('Mark done error: ' . $e->getMessage());
+            $error = 'A system error occurred. Please try again later.';
+        }
     }
 }
 ?>
@@ -253,7 +258,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_done'])) {
                                 </div>
                                 <?php if ($sub['status'] !== 'done'): ?>
                                     <form method="POST" style="display: inline;">
-                                        <input type="hidden" name="submission_id" value="<?php echo $sub['id']; ?>">
+                                        <?php echo csrf_input(); ?>
+                                        <input type="hidden" name="submission_id" value="<?php echo (int)$sub['id']; ?>">
                                         <button type="submit" name="mark_done" class="mark-done-btn">Mark as Done</button>
                                     </form>
                                 <?php endif; ?>
@@ -268,7 +274,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_done'])) {
 
                 <?php
                 $submitted_ids = array_map(function($s) { return $s['user_id']; }, $submissions);
-                $missing_students = array_filter($students, function($s) { return !in_array($s['id'], $submitted_ids); });
+                $missing_students = array_filter($students, function($s) use ($submitted_ids) { return !in_array($s['id'], $submitted_ids); });
                 ?>
 
                 <?php if (!empty($missing_students)): ?>
