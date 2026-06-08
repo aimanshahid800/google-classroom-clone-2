@@ -137,7 +137,7 @@ $assignments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <?php if (!empty($assignments)): ?>
                     <?php foreach ($assignments as $assign): 
                         // Get submission status for this user
-                        $stmt = $pdo->prepare('SELECT status FROM submissions WHERE assignment_id = ? AND user_id = ?');
+                        $stmt = $pdo->prepare('SELECT status, file_path FROM submissions WHERE assignment_id = ? AND user_id = ?');
                         $stmt->execute([$assign['id'], $user['id']]);
                         $submission = $stmt->fetch(PDO::FETCH_ASSOC);
                         $status = $submission ? $submission['status'] : 'missing';

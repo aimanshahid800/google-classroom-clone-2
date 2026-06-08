@@ -24,6 +24,7 @@ $success = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = trim($_POST['title'] ?? '');
+    $description = trim($_POST['description'] ?? '');
     $topic = trim($_POST['topic'] ?? '');
     $due_date = $_POST['due_date'] ?? '';
 
@@ -42,10 +43,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($errors)) {
         try {
             $stmt = $pdo->prepare('
-                INSERT INTO assignments (class_id, title, topic, due_date)
-                VALUES (?, ?, ?, ?)
+                INSERT INTO assignments (class_id, title, description, topic, due_date)
+                VALUES (?, ?, ?, ?, ?)
             ');
-            $stmt->execute([$class_id, $title, $topic, $due_date ?: null]);
+            $stmt->execute([$class_id, $title, $description ?: null, $topic, $due_date ?: null]);
             $success = true;
             header('Location: ' . BASE_URL . '/classes/classwork.php?class_id=' . $class_id);
             exit;
@@ -172,6 +173,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="form-group">
                         <label for="title">Title *</label>
                         <input type="text" id="title" name="title" required value="<?php echo htmlspecialchars($_POST['title'] ?? ''); ?>" placeholder="e.g., Web Design Project">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Instructions (optional)</label>
+                        <textarea id="description" name="description" rows="4" placeholder="Add instructions for your students..." style="width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; font-family: inherit; resize: vertical;"><?php echo htmlspecialchars($_POST['description'] ?? ''); ?></textarea>
                     </div>
 
                     <div class="form-group">

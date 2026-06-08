@@ -248,9 +248,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_done'])) {
                                 <div class="submission-time">
                                     Submitted: <?php echo date('M d, Y • H:i', strtotime($sub['submitted_at'])); ?>
                                 </div>
+                                <?php if (!empty($sub['content'])): ?>
                                 <div class="submission-content">
                                     <?php echo htmlspecialchars($sub['content']); ?>
                                 </div>
+                                <?php endif; ?>
+                                <?php if (!empty($sub['file_path'])): ?>
+                                <div style="margin-bottom: 12px; padding: 10px 14px; background: #f0f4f9; border-radius: 8px; display: flex; align-items: center; gap: 8px;">
+                                    <span>&#128206;</span>
+                                    <a href="<?php echo BASE_URL . '/' . htmlspecialchars($sub['file_path']); ?>" target="_blank" style="color: var(--primary); font-weight: 500; font-size: 13px;">
+                                        <?php echo htmlspecialchars(basename($sub['file_path'])); ?>
+                                    </a>
+                                </div>
+                                <?php endif; ?>
                                 <?php if ($sub['status'] !== 'done'): ?>
                                     <form method="POST" style="display: inline;">
                                         <input type="hidden" name="submission_id" value="<?php echo $sub['id']; ?>">
@@ -268,7 +278,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_done'])) {
 
                 <?php
                 $submitted_ids = array_map(function($s) { return $s['user_id']; }, $submissions);
-                $missing_students = array_filter($students, function($s) { return !in_array($s['id'], $submitted_ids); });
+                $missing_students = array_filter($students, function($s) use ($submitted_ids) { return !in_array($s['id'], $submitted_ids); });
                 ?>
 
                 <?php if (!empty($missing_students)): ?>
