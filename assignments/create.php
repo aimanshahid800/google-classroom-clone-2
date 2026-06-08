@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ');
             $stmt->execute([$class_id, $title, $topic, $due_date ?: null]);
             $success = true;
-            header('Location: /Uni-Team-Project/google-classroom-clone-2/classes/classwork.php?class_id=' . $class_id);
+            header('Location: ' . BASE_URL . '/classes/classwork.php?class_id=' . $class_id);
             exit;
         } catch (PDOException $e) {
             $errors[] = 'Database error: ' . $e->getMessage();
@@ -186,7 +186,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <div class="button-group">
                         <button type="submit" class="submit-btn">Create Assignment</button>
-                        <a href="/Uni-Team-Project/google-classroom-clone-2/classes/classwork.php?class_id=<?php echo $class_id; ?>" class="cancel-btn" style="text-align: center; display: flex; align-items: center; justify-content: center; text-decoration: none;">Cancel</a>
+                        <a href="<?php echo BASE_URL; ?>/classes/classwork.php?class_id=<?php echo $class_id; ?>" class="cancel-btn" style="text-align: center; display: flex; align-items: center; justify-content: center; text-decoration: none;">Cancel</a>
                     </div>
                 </form>
             </div>

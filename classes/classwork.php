@@ -130,7 +130,7 @@ $assignments = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <div style="max-width: 800px;">
                 <?php if ($user['role'] === 'teacher'): ?>
                     <div style="margin-bottom: 24px;">
-                        <a href="/Uni-Team-Project/google-classroom-clone-2/assignments/create.php?class_id=<?php echo $class_id; ?>" style="display: inline-block; padding: 10px 20px; background: var(--primary); color: white; border-radius: 8px; text-decoration: none; font-weight: 600;">+ Create Assignment</a>
+                        <a href="<?php echo BASE_URL; ?>/assignments/create.php?class_id=<?php echo $class_id; ?>" style="display: inline-block; padding: 10px 20px; background: var(--primary); color: white; border-radius: 8px; text-decoration: none; font-weight: 600;">+ Create Assignment</a>
                     </div>
                 <?php endif; ?>
 
@@ -160,12 +160,12 @@ $assignments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         <div style="font-size: 12px; padding: 6px 12px; border-radius: 6px; background: <?php echo $status === 'handed_in' ? '#e8f5e9' : ($status === 'done' ? '#e8f5e9' : '#ffebee'); ?>; color: <?php echo $status === 'handed_in' ? '#2e7d32' : ($status === 'done' ? '#2e7d32' : '#c62828'); ?>; font-weight: 600; margin-bottom: 8px;">
                                             <?php echo ucfirst(str_replace('_', ' ', $status)); ?>
                                         </div>
-                                        <a href="/Uni-Team-Project/google-classroom-clone-2/assignments/submit.php?assignment_id=<?php echo $assign['id']; ?>&class_id=<?php echo $class_id; ?>" style="display: inline-block; padding: 8px 12px; background: var(--primary); color: white; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 600;">
+                                        <a href="<?php echo BASE_URL; ?>/assignments/submit.php?assignment_id=<?php echo $assign['id']; ?>&class_id=<?php echo $class_id; ?>" style="display: inline-block; padding: 8px 12px; background: var(--primary); color: white; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 600;">
                                             <?php echo $submission ? 'View' : 'Submit'; ?>
                                         </a>
                                     </div>
                                 <?php else: ?>
-                                    <a href="/Uni-Team-Project/google-classroom-clone-2/assignments/view_work.php?assignment_id=<?php echo $assign['id']; ?>&class_id=<?php echo $class_id; ?>" style="display: inline-block; padding: 8px 12px; background: var(--primary); color: white; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 600;">View Submissions</a>
+                                    <a href="<?php echo BASE_URL; ?>/assignments/view_work.php?assignment_id=<?php echo $assign['id']; ?>&class_id=<?php echo $class_id; ?>" style="display: inline-block; padding: 8px 12px; background: var(--primary); color: white; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 600;">View Submissions</a>
                                 <?php endif; ?>
                             </div>
                         </div>

@@ -2,9 +2,9 @@
 require_once __DIR__ . '/config.php';
 
 if (empty($_SESSION['user_id'])) {
-    header('Location: /Uni-Team-Project/google-classroom-clone-2/auth/login.php');
+    header('Location: ' . BASE_URL . '/auth/login.php');
     exit;
 }
 
-header('Location: /Uni-Team-Project/google-classroom-clone-2/home/dashboard.php');
+header('Location: ' . BASE_URL . '/home/dashboard.php');
 exit;

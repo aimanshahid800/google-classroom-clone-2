@@ -4,6 +4,9 @@
 
 session_start();
 
+// Base URL path for this project (change if project location differs)
+define('BASE_URL', '/Uni-Team-Project/google-classroom-clone-2');
+
 $dbHost = 'localhost';
 $dbName = 'classroom_clone';
 $dbUser = 'root';
@@ -19,7 +22,7 @@ try {
 // Helper: require login
 function require_login() {
     if (empty($_SESSION['user_id'])) {
-        header('Location: /auth/login.php');
+        header('Location: ' . BASE_URL . '/auth/login.php');
         exit;
     }
 }

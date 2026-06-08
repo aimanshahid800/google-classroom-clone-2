@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'email' => $user['email'],
                     'role' => $user['role']
                 ];
-                header('Location: /Uni-Team-Project/google-classroom-clone-2/home/dashboard.php');
+                header('Location: ' . BASE_URL . '/home/dashboard.php');
                 exit;
             } else {
                 $errors[] = 'Invalid email or password.';

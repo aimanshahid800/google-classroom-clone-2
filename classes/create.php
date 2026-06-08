@@ -183,7 +183,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </form>
 
                 <div class="cancel-link">
-                    <a href="/Uni-Team-Project/google-classroom-clone-2/home/dashboard.php">Cancel</a>
+                    <a href="<?php echo BASE_URL; ?>/home/dashboard.php">Cancel</a>
                 </div>
             </div>
         </main>
