@@ -7,60 +7,85 @@ $assignment_id = $_GET['assignment_id'] ?? null;
 $class_id = $_GET['class_id'] ?? null;
 
 if (!$assignment_id || !$class_id) {
-    die('Invalid request.');
+    render_error_page('Invalid Request', 'Missing required parameters.', 400);
 }
 
 // Verify user is a teacher in this class
-$stmt = $pdo->prepare('
-    SELECT cm.id FROM class_members cm
-    WHERE cm.class_id = ? AND cm.user_id = ? AND cm.role = "teacher"
-');
-$stmt->execute([$class_id, $user['id']]);
-if (!$stmt->fetch()) {
-    die('Only teachers can view submissions.');
+try {
+    $stmt = $pdo->prepare('
+        SELECT cm.id FROM class_members cm
+        WHERE cm.class_id = ? AND cm.user_id = ? AND cm.role = "teacher"
+    ');
+    $stmt->execute([$class_id, $user['id']]);
+    if (!$stmt->fetch()) {
+        render_error_page('Access Denied', 'Only teachers can view submissions.');
+    }
+} catch (PDOException $e) {
+    error_log('View work teacher check failed: ' . $e->getMessage());
+    render_error_page('Error', 'Something went wrong. Please try again later.', 500);
 }
 
 // Get assignment details
-$stmt = $pdo->prepare('SELECT a.*, c.name as class_name FROM assignments a JOIN classes c ON a.class_id = c.id WHERE a.id = ? AND a.class_id = ?');
-$stmt->execute([$assignment_id, $class_id]);
-$assignment = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if (!$assignment) {
-    die('Assignment not found.');
+try {
+    $stmt = $pdo->prepare('SELECT a.*, c.name as class_name FROM assignments a JOIN classes c ON a.class_id = c.id WHERE a.id = ? AND a.class_id = ?');
+    $stmt->execute([$assignment_id, $class_id]);
+    $assignment = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$assignment) {
+        render_error_page('Not Found', 'Assignment not found.', 404);
+    }
+} catch (PDOException $e) {
+    error_log('View work assignment fetch failed: ' . $e->getMessage());
+    render_error_page('Error', 'Something went wrong. Please try again later.', 500);
 }
 
 // Get all submissions for this assignment
-$stmt = $pdo->prepare('
-    SELECT s.*, u.name, u.email
-    FROM submissions s
-    JOIN users u ON s.user_id = u.id
-    WHERE s.assignment_id = ?
-    ORDER BY s.submitted_at DESC
-');
-$stmt->execute([$assignment_id]);
-$submissions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$submissions = [];
+try {
+    $stmt = $pdo->prepare('
+        SELECT s.*, u.name, u.email
+        FROM submissions s
+        JOIN users u ON s.user_id = u.id
+        WHERE s.assignment_id = ?
+        ORDER BY s.submitted_at DESC
+    ');
+    $stmt->execute([$assignment_id]);
+    $submissions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    error_log('View work submissions query failed: ' . $e->getMessage());
+}
 
 // Get all students in class (to see who hasn't submitted)
-$stmt = $pdo->prepare('
-    SELECT u.id, u.name, u.email
-    FROM class_members cm
-    JOIN users u ON cm.user_id = u.id
-    WHERE cm.class_id = ? AND cm.role = "student"
-    ORDER BY u.name ASC
-');
-$stmt->execute([$class_id]);
-$students = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$students = [];
+try {
+    $stmt = $pdo->prepare('
+        SELECT u.id, u.name, u.email
+        FROM class_members cm
+        JOIN users u ON cm.user_id = u.id
+        WHERE cm.class_id = ? AND cm.role = "student"
+        ORDER BY u.name ASC
+    ');
+    $stmt->execute([$class_id]);
+    $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    error_log('View work students query failed: ' . $e->getMessage());
+}
 
 // Mark submission as done
+$error = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_done'])) {
-    $submission_id = $_POST['submission_id'];
-    try {
-        $stmt = $pdo->prepare('UPDATE submissions SET status = ? WHERE id = ?');
-        $stmt->execute(['done', $submission_id]);
-        header('Location: view_work.php?assignment_id=' . $assignment_id . '&class_id=' . $class_id);
-        exit;
-    } catch (PDOException $e) {
-        $error = 'Error updating submission: ' . $e->getMessage();
+    $submission_id = filter_input(INPUT_POST, 'submission_id', FILTER_VALIDATE_INT);
+    if (!$submission_id) {
+        $error = 'Invalid submission.';
+    } else {
+        try {
+            $stmt = $pdo->prepare('UPDATE submissions SET status = ? WHERE id = ?');
+            $stmt->execute(['done', $submission_id]);
+            header('Location: view_work.php?assignment_id=' . $assignment_id . '&class_id=' . $class_id);
+            exit;
+        } catch (PDOException $e) {
+            error_log('Mark submission done failed: ' . $e->getMessage());
+            $error = 'Failed to update submission. Please try again.';
+        }
     }
 }
 ?>

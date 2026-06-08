@@ -6,17 +6,22 @@ $user = current_user();
 $class_id = $_GET['class_id'] ?? null;
 
 if (!$class_id) {
-    die('Class not found.');
+    render_error_page('Class Not Found', 'No class was specified.', 404);
 }
 
 // Verify user is teacher in this class
-$stmt = $pdo->prepare('
-    SELECT cm.id FROM class_members cm
-    WHERE cm.class_id = ? AND cm.user_id = ? AND cm.role = "teacher"
-');
-$stmt->execute([$class_id, $user['id']]);
-if (!$stmt->fetch()) {
-    die('Only teachers can create assignments.');
+try {
+    $stmt = $pdo->prepare('
+        SELECT cm.id FROM class_members cm
+        WHERE cm.class_id = ? AND cm.user_id = ? AND cm.role = "teacher"
+    ');
+    $stmt->execute([$class_id, $user['id']]);
+    if (!$stmt->fetch()) {
+        render_error_page('Access Denied', 'Only teachers can create assignments.');
+    }
+} catch (PDOException $e) {
+    error_log('Assignment create teacher check failed: ' . $e->getMessage());
+    render_error_page('Error', 'Something went wrong. Please try again later.', 500);
 }
 
 $errors = [];
@@ -50,7 +55,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header('Location: /Uni-Team-Project/google-classroom-clone-2/classes/classwork.php?class_id=' . $class_id);
             exit;
         } catch (PDOException $e) {
-            $errors[] = 'Database error: ' . $e->getMessage();
+            error_log('Assignment creation failed: ' . $e->getMessage());
+            $errors[] = 'Failed to create assignment. Please try again later.';
         }
     }
 }

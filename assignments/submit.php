@@ -7,29 +7,43 @@ $assignment_id = $_GET['assignment_id'] ?? null;
 $class_id = $_GET['class_id'] ?? null;
 
 if (!$assignment_id || !$class_id) {
-    die('Invalid request.');
+    render_error_page('Invalid Request', 'Missing required parameters.', 400);
 }
 
 // Verify user is a member of this class
-$stmt = $pdo->prepare('SELECT id FROM class_members WHERE class_id = ? AND user_id = ?');
-$stmt->execute([$class_id, $user['id']]);
-if (!$stmt->fetch()) {
-    die('You do not have access to this class.');
+try {
+    $stmt = $pdo->prepare('SELECT id FROM class_members WHERE class_id = ? AND user_id = ?');
+    $stmt->execute([$class_id, $user['id']]);
+    if (!$stmt->fetch()) {
+        render_error_page('Access Denied', 'You do not have access to this class.');
+    }
+} catch (PDOException $e) {
+    error_log('Submit membership check failed: ' . $e->getMessage());
+    render_error_page('Error', 'Something went wrong. Please try again later.', 500);
 }
 
 // Get assignment details
-$stmt = $pdo->prepare('SELECT a.*, c.name as class_name FROM assignments a JOIN classes c ON a.class_id = c.id WHERE a.id = ? AND a.class_id = ?');
-$stmt->execute([$assignment_id, $class_id]);
-$assignment = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if (!$assignment) {
-    die('Assignment not found.');
+try {
+    $stmt = $pdo->prepare('SELECT a.*, c.name as class_name FROM assignments a JOIN classes c ON a.class_id = c.id WHERE a.id = ? AND a.class_id = ?');
+    $stmt->execute([$assignment_id, $class_id]);
+    $assignment = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$assignment) {
+        render_error_page('Not Found', 'Assignment not found.', 404);
+    }
+} catch (PDOException $e) {
+    error_log('Submit assignment fetch failed: ' . $e->getMessage());
+    render_error_page('Error', 'Something went wrong. Please try again later.', 500);
 }
 
 // Get existing submission if any
-$stmt = $pdo->prepare('SELECT * FROM submissions WHERE assignment_id = ? AND user_id = ?');
-$stmt->execute([$assignment_id, $user['id']]);
-$submission = $stmt->fetch(PDO::FETCH_ASSOC);
+$submission = null;
+try {
+    $stmt = $pdo->prepare('SELECT * FROM submissions WHERE assignment_id = ? AND user_id = ?');
+    $stmt->execute([$assignment_id, $user['id']]);
+    $submission = $stmt->fetch(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    error_log('Submit existing submission fetch failed: ' . $e->getMessage());
+}
 
 $errors = [];
 $success = false;
@@ -60,7 +74,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header('Location: /Uni-Team-Project/google-classroom-clone-2/classes/classwork.php?class_id=' . $class_id);
             exit;
         } catch (PDOException $e) {
-            $errors[] = 'Database error: ' . $e->getMessage();
+            error_log('Assignment submission failed: ' . $e->getMessage());
+            $errors[] = 'Failed to submit assignment. Please try again later.';
         }
     }
 }
