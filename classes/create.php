@@ -21,8 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = 'Class name is required.';
     }
 
-    // Generate random 6-char code
-    $code = strtoupper(substr(md5(uniqid()), 0, 6));
+    // Generate cryptographically secure 6-char code
+    $code = strtoupper(substr(bin2hex(random_bytes(4)), 0, 6));
 
     if (empty($errors)) {
         try {
@@ -45,7 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header('Location: stream.php?class_id=' . $class_id);
             exit;
         } catch (PDOException $e) {
-            $errors[] = 'Database error: ' . $e->getMessage();
+            error_log('Class creation error: ' . $e->getMessage());
+            $errors[] = 'A system error occurred. Please try again later.';
         }
     }
 }
@@ -159,6 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php endif; ?>
 
                 <form method="POST">
+                    <?php echo csrf_input(); ?>
                     <div class="form-group">
                         <label for="name">Class Name *</label>
                         <input type="text" id="name" name="name" required value="<?php echo htmlspecialchars($_POST['name'] ?? ''); ?>">

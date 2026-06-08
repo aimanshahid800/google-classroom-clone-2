@@ -3,7 +3,7 @@ require_once __DIR__ . '/../config.php';
 require_login();
 
 $user = current_user();
-$class_id = $_GET['class_id'] ?? null;
+$class_id = filter_input(INPUT_GET, 'class_id', FILTER_VALIDATE_INT);
 
 if (!$class_id) {
     die('Class not found.');
@@ -122,15 +122,15 @@ $assignments = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
 
             <div class="tabs">
-                <a href="stream.php?class_id=<?php echo $class_id; ?>" class="tab">Stream</a>
-                <a href="classwork.php?class_id=<?php echo $class_id; ?>" class="tab active">Classwork</a>
-                <a href="people.php?class_id=<?php echo $class_id; ?>" class="tab">People</a>
+                <a href="stream.php?class_id=<?php echo (int)$class_id; ?>" class="tab">Stream</a>
+                <a href="classwork.php?class_id=<?php echo (int)$class_id; ?>" class="tab active">Classwork</a>
+                <a href="people.php?class_id=<?php echo (int)$class_id; ?>" class="tab">People</a>
             </div>
 
             <div style="max-width: 800px;">
                 <?php if ($user['role'] === 'teacher'): ?>
                     <div style="margin-bottom: 24px;">
-                        <a href="/Uni-Team-Project/google-classroom-clone-2/assignments/create.php?class_id=<?php echo $class_id; ?>" style="display: inline-block; padding: 10px 20px; background: var(--primary); color: white; border-radius: 8px; text-decoration: none; font-weight: 600;">+ Create Assignment</a>
+                        <a href="/Uni-Team-Project/google-classroom-clone-2/assignments/create.php?class_id=<?php echo (int)$class_id; ?>" style="display: inline-block; padding: 10px 20px; background: var(--primary); color: white; border-radius: 8px; text-decoration: none; font-weight: 600;">+ Create Assignment</a>
                     </div>
                 <?php endif; ?>
 
@@ -160,12 +160,12 @@ $assignments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         <div style="font-size: 12px; padding: 6px 12px; border-radius: 6px; background: <?php echo $status === 'handed_in' ? '#e8f5e9' : ($status === 'done' ? '#e8f5e9' : '#ffebee'); ?>; color: <?php echo $status === 'handed_in' ? '#2e7d32' : ($status === 'done' ? '#2e7d32' : '#c62828'); ?>; font-weight: 600; margin-bottom: 8px;">
                                             <?php echo ucfirst(str_replace('_', ' ', $status)); ?>
                                         </div>
-                                        <a href="/Uni-Team-Project/google-classroom-clone-2/assignments/submit.php?assignment_id=<?php echo $assign['id']; ?>&class_id=<?php echo $class_id; ?>" style="display: inline-block; padding: 8px 12px; background: var(--primary); color: white; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 600;">
+                                        <a href="/Uni-Team-Project/google-classroom-clone-2/assignments/submit.php?assignment_id=<?php echo $assign['id']; ?>&class_id=<?php echo (int)$class_id; ?>" style="display: inline-block; padding: 8px 12px; background: var(--primary); color: white; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 600;">
                                             <?php echo $submission ? 'View' : 'Submit'; ?>
                                         </a>
                                     </div>
                                 <?php else: ?>
-                                    <a href="/Uni-Team-Project/google-classroom-clone-2/assignments/view_work.php?assignment_id=<?php echo $assign['id']; ?>&class_id=<?php echo $class_id; ?>" style="display: inline-block; padding: 8px 12px; background: var(--primary); color: white; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 600;">View Submissions</a>
+                                    <a href="/Uni-Team-Project/google-classroom-clone-2/assignments/view_work.php?assignment_id=<?php echo $assign['id']; ?>&class_id=<?php echo (int)$class_id; ?>" style="display: inline-block; padding: 8px 12px; background: var(--primary); color: white; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 600;">View Submissions</a>
                                 <?php endif; ?>
                             </div>
                         </div>

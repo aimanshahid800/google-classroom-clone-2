@@ -3,7 +3,7 @@ require_once __DIR__ . '/../config.php';
 require_login();
 
 $user = current_user();
-$class_id = $_GET['class_id'] ?? null;
+$class_id = filter_input(INPUT_GET, 'class_id', FILTER_VALIDATE_INT);
 
 if (!$class_id) {
     die('Class not found.');
@@ -148,9 +148,9 @@ $members = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
 
             <div class="tabs">
-                <a href="stream.php?class_id=<?php echo $class_id; ?>" class="tab">Stream</a>
-                <a href="classwork.php?class_id=<?php echo $class_id; ?>" class="tab">Classwork</a>
-                <a href="people.php?class_id=<?php echo $class_id; ?>" class="tab active">People</a>
+                <a href="stream.php?class_id=<?php echo (int)$class_id; ?>" class="tab">Stream</a>
+                <a href="classwork.php?class_id=<?php echo (int)$class_id; ?>" class="tab">Classwork</a>
+                <a href="people.php?class_id=<?php echo (int)$class_id; ?>" class="tab active">People</a>
             </div>
 
             <div style="max-width: 600px;">

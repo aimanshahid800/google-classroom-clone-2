@@ -39,7 +39,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
         } catch (PDOException $e) {
-            $errors[] = 'Database error: ' . $e->getMessage();
+            error_log('Join class error: ' . $e->getMessage());
+            $errors[] = 'A system error occurred. Please try again later.';
         }
     }
 }
@@ -166,6 +167,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <form method="POST">
+                    <?php echo csrf_input(); ?>
                     <div class="form-group">
                         <label for="code">Class Code</label>
                         <input type="text" id="code" name="code" maxlength="6" placeholder="e.g., ABC123" required>
