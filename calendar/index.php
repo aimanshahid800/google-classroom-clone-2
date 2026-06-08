@@ -6,12 +6,7 @@ $user = current_user();
 // TODO: implement calendar weekly view with class filter
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Calendar | Classroom Clone</title>
-  <link rel="stylesheet" href="../style.css">
+<?php $pageTitle = 'Calendar | Classroom Clone'; include __DIR__ . '/../includes/header.php'; ?>
 </head>
 <body>
   <div class="page-shell">
@@ -22,5 +17,4 @@ $user = current_user();
       <p>Weekly calendar view will be added here.</p>
     </main>
   </div>
-</body>
-</html>
+<?php include __DIR__ . '/../includes/footer.php'; ?>

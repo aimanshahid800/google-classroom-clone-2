@@ -17,13 +17,7 @@ $stmt->execute([$user['id']]);
 $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard | Classroom Clone</title>
-  <link rel="stylesheet" href="../style.css">
+<?php $pageTitle = 'Dashboard | Classroom Clone'; include __DIR__ . '/../includes/header.php'; ?>
   <style>
     .dashboard-header {
       display: flex;
@@ -180,7 +174,7 @@ $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <?php if ($class['section']): ?>
                   <div class="class-section"><?php echo htmlspecialchars($class['section']); ?></div>
                 <?php endif; ?>
-                <div class="class-teacher">👨‍🏫 <?php echo htmlspecialchars($class['teacher_name']); ?></div>
+                <div class="class-teacher">&#x1F468;&#x200D;&#x1F3EB; <?php echo htmlspecialchars($class['teacher_name']); ?></div>
                 <div class="class-code">Code: <strong><?php echo htmlspecialchars($class['code']); ?></strong></div>
                 <div class="class-actions">
                   <a href="../classes/stream.php?class_id=<?php echo $class['id']; ?>" class="class-action-link">Stream</a>
@@ -193,7 +187,7 @@ $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
       <?php else: ?>
         <div class="empty-state">
-          <div class="empty-state-icon">📚</div>
+          <div class="empty-state-icon">&#x1F4DA;</div>
           <h2>No classes yet</h2>
           <p>Create a new class or join an existing one to get started.</p>
           <div style="margin-top: 24px;">
@@ -204,5 +198,4 @@ $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
       <?php endif; ?>
     </main>
   </div>
-</body>
-</html>
+<?php include __DIR__ . '/../includes/footer.php'; ?>

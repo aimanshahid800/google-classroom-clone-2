@@ -9,17 +9,8 @@ if (!$class_id) {
     die('Class not found.');
 }
 
-// Verify user is a member of this class
-$stmt = $pdo->prepare('SELECT id FROM class_members WHERE class_id = ? AND user_id = ?');
-$stmt->execute([$class_id, $user['id']]);
-if (!$stmt->fetch()) {
-    die('You do not have access to this class.');
-}
-
-// Get class info
-$stmt = $pdo->prepare('SELECT c.*, u.name AS teacher_name FROM classes c JOIN users u ON c.owner_id = u.id WHERE c.id = ?');
-$stmt->execute([$class_id]);
-$class = $stmt->fetch(PDO::FETCH_ASSOC);
+require_class_member($pdo, $class_id, $user['id']);
+$class = get_class_info($pdo, $class_id);
 
 // Get assignments
 $stmt = $pdo->prepare('SELECT * FROM assignments WHERE class_id = ? ORDER BY due_date ASC');
@@ -27,57 +18,8 @@ $stmt->execute([$class_id]);
 $assignments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Classwork | Classroom Clone</title>
-    <link rel="stylesheet" href="../style.css">
+<?php $pageTitle = 'Classwork | Classroom Clone'; include __DIR__ . '/../includes/header.php'; ?>
     <style>
-        .class-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 40px 24px;
-            border-radius: 12px;
-            margin-bottom: 32px;
-        }
-        .class-header h1 {
-            margin: 0;
-            font-size: 32px;
-        }
-        .class-header p {
-            margin: 8px 0 0;
-            opacity: 0.9;
-        }
-        .class-meta {
-            display: flex;
-            gap: 24px;
-            margin-top: 16px;
-            font-size: 14px;
-        }
-        .tabs {
-            display: flex;
-            gap: 24px;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 24px;
-        }
-        .tab {
-            padding: 12px 0;
-            border-bottom: 3px solid transparent;
-            cursor: pointer;
-            color: var(--muted);
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-        .tab:hover {
-            color: var(--text);
-        }
-        .tab.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
-        }
         .assignment {
             background: white;
             padding: 20px;
@@ -98,11 +40,6 @@ $assignments = $stmt->fetchAll(PDO::FETCH_ASSOC);
             font-size: 13px;
             color: var(--muted);
         }
-        .empty-message {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--muted);
-        }
     </style>
 </head>
 <body>
@@ -111,21 +48,12 @@ $assignments = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <main class="content">
             <?php include __DIR__ . '/../includes/navbar.php'; ?>
 
-            <div class="class-header">
-                <h1><?php echo htmlspecialchars($class['name']); ?></h1>
-                <div class="class-meta">
-                    <?php if ($class['section']): ?>
-                        <span>Section: <?php echo htmlspecialchars($class['section']); ?></span>
-                    <?php endif; ?>
-                    <span>👨‍🏫 <?php echo htmlspecialchars($class['teacher_name']); ?></span>
-                </div>
-            </div>
-
-            <div class="tabs">
-                <a href="stream.php?class_id=<?php echo $class_id; ?>" class="tab">Stream</a>
-                <a href="classwork.php?class_id=<?php echo $class_id; ?>" class="tab active">Classwork</a>
-                <a href="people.php?class_id=<?php echo $class_id; ?>" class="tab">People</a>
-            </div>
+            <?php
+            $classMeta = ['&#x1F468;&#x200D;&#x1F3EB; ' . htmlspecialchars($class['teacher_name'])];
+            include __DIR__ . '/../includes/class_header.php';
+            $activeTab = 'classwork';
+            include __DIR__ . '/../includes/class_tabs.php';
+            ?>
 
             <div style="max-width: 800px;">
                 <?php if ($user['role'] === 'teacher'): ?>
@@ -148,17 +76,17 @@ $assignments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <div class="assignment-title"><?php echo htmlspecialchars($assign['title']); ?></div>
                                     <div class="assignment-meta">
                                         <?php if ($assign['topic']): ?>
-                                            <span>📁 <?php echo htmlspecialchars($assign['topic']); ?></span>
+                                            <span>&#x1F4C1; <?php echo htmlspecialchars($assign['topic']); ?></span>
                                         <?php endif; ?>
                                         <?php if ($assign['due_date']): ?>
-                                            <span>📅 Due: <?php echo date('M d, Y • H:i', strtotime($assign['due_date'])); ?></span>
+                                            <span>&#x1F4C5; Due: <?php echo format_date($assign['due_date']); ?></span>
                                         <?php endif; ?>
                                     </div>
                                 </div>
                                 <?php if ($user['role'] === 'student'): ?>
                                     <div style="text-align: right;">
-                                        <div style="font-size: 12px; padding: 6px 12px; border-radius: 6px; background: <?php echo $status === 'handed_in' ? '#e8f5e9' : ($status === 'done' ? '#e8f5e9' : '#ffebee'); ?>; color: <?php echo $status === 'handed_in' ? '#2e7d32' : ($status === 'done' ? '#2e7d32' : '#c62828'); ?>; font-weight: 600; margin-bottom: 8px;">
-                                            <?php echo ucfirst(str_replace('_', ' ', $status)); ?>
+                                        <div class="status-badge status-<?php echo strtolower(str_replace('_', '-', $status)); ?>" style="margin-bottom: 8px;">
+                                            <?php echo format_status($status); ?>
                                         </div>
                                         <a href="/Uni-Team-Project/google-classroom-clone-2/assignments/submit.php?assignment_id=<?php echo $assign['id']; ?>&class_id=<?php echo $class_id; ?>" style="display: inline-block; padding: 8px 12px; background: var(--primary); color: white; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 600;">
                                             <?php echo $submission ? 'View' : 'Submit'; ?>
@@ -172,11 +100,10 @@ $assignments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php endforeach; ?>
                 <?php else: ?>
                     <div class="empty-message">
-                        <p>📋 No assignments yet</p>
+                        <p>&#x1F4CB; No assignments yet</p>
                     </div>
                 <?php endif; ?>
             </div>
         </main>
     </div>
-</body>
-</html>
+<?php include __DIR__ . '/../includes/footer.php'; ?>

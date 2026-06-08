@@ -10,12 +10,7 @@ if (!$assignment_id || !$class_id) {
     die('Invalid request.');
 }
 
-// Verify user is a member of this class
-$stmt = $pdo->prepare('SELECT id FROM class_members WHERE class_id = ? AND user_id = ?');
-$stmt->execute([$class_id, $user['id']]);
-if (!$stmt->fetch()) {
-    die('You do not have access to this class.');
-}
+require_class_member($pdo, $class_id, $user['id']);
 
 // Get assignment details
 $stmt = $pdo->prepare('SELECT a.*, c.name as class_name FROM assignments a JOIN classes c ON a.class_id = c.id WHERE a.id = ? AND a.class_id = ?');
@@ -66,13 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Submit Assignment | Classroom Clone</title>
-    <link rel="stylesheet" href="../style.css">
+<?php $pageTitle = 'Submit Assignment | Classroom Clone'; include __DIR__ . '/../includes/header.php'; ?>
     <style>
         .container {
             max-width: 800px;
@@ -100,98 +89,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 13px;
             color: var(--muted);
         }
-        .form-container {
-            background: white;
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--text);
-        }
-        .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-family: inherit;
-            font-size: 14px;
-            resize: vertical;
-            min-height: 200px;
-        }
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
-        }
-        .alert {
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-        .alert-error {
-            background: #ffebee;
-            color: #c62828;
-            border: 1px solid #ef5350;
-        }
-        .alert-success {
-            background: #e8f5e9;
-            color: #2e7d32;
-            border: 1px solid #66bb6a;
-        }
-        .status-badge {
-            display: inline-block;
-            padding: 6px 12px;
-            background: #e8f5e9;
-            color: #2e7d32;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        .button-group {
-            display: flex;
-            gap: 12px;
-            margin-top: 24px;
-        }
-        .submit-btn {
-            flex: 1;
-            padding: 12px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        .submit-btn:hover {
-            background: #1765cc;
-        }
-        .cancel-btn {
-            flex: 1;
-            padding: 12px;
-            background: var(--surface-alt);
-            color: var(--primary);
-            border: 2px solid var(--primary);
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .cancel-btn:hover {
-            background: #f0f4f9;
-        }
         .submitted-info {
             background: #e8f5e9;
             padding: 12px;
@@ -212,32 +109,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="assignment-header">
                     <h1><?php echo htmlspecialchars($assignment['title']); ?></h1>
                     <div class="assignment-meta">
-                        <span>📚 <?php echo htmlspecialchars($assignment['class_name']); ?></span>
+                        <span>&#x1F4DA; <?php echo htmlspecialchars($assignment['class_name']); ?></span>
                         <?php if ($assignment['due_date']): ?>
-                            <span>📅 Due: <?php echo date('M d, Y • H:i', strtotime($assignment['due_date'])); ?></span>
+                            <span>&#x1F4C5; Due: <?php echo format_date($assignment['due_date']); ?></span>
                         <?php endif; ?>
                     </div>
                 </div>
 
-                <div class="form-container">
+                <div class="form-container" style="margin: 0; max-width: none;">
                     <?php if ($submission): ?>
                         <div class="submitted-info">
-                            ✓ You submitted this assignment on <?php echo date('M d, Y • H:i', strtotime($submission['submitted_at'])); ?>
+                            &check; You submitted this assignment on <?php echo format_date($submission['submitted_at']); ?>
                         </div>
                     <?php endif; ?>
 
-                    <?php if (!empty($errors)): ?>
-                        <div class="alert alert-error">
-                            <?php foreach ($errors as $error): ?>
-                                <div>✗ <?php echo htmlspecialchars($error); ?></div>
-                            <?php endforeach; ?>
-                        </div>
-                    <?php endif; ?>
+                    <?php include __DIR__ . '/../includes/alerts.php'; ?>
 
                     <form method="POST">
                         <div class="form-group">
                             <label for="content">Your Submission</label>
-                            <textarea id="content" name="content" required placeholder="Type your answer or paste your work here..."><?php echo htmlspecialchars($_POST['content'] ?? ($submission['content'] ?? '')); ?></textarea>
+                            <textarea id="content" name="content" required placeholder="Type your answer or paste your work here..." style="min-height: 200px;"><?php echo htmlspecialchars($_POST['content'] ?? ($submission['content'] ?? '')); ?></textarea>
                         </div>
 
                         <div class="button-group">
@@ -249,5 +140,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </main>
     </div>
-</body>
-</html>
+<?php include __DIR__ . '/../includes/footer.php'; ?>

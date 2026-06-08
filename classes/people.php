@@ -9,17 +9,8 @@ if (!$class_id) {
     die('Class not found.');
 }
 
-// Verify user is a member of this class
-$stmt = $pdo->prepare('SELECT id FROM class_members WHERE class_id = ? AND user_id = ?');
-$stmt->execute([$class_id, $user['id']]);
-if (!$stmt->fetch()) {
-    die('You do not have access to this class.');
-}
-
-// Get class info
-$stmt = $pdo->prepare('SELECT c.*, u.name AS teacher_name FROM classes c JOIN users u ON c.owner_id = u.id WHERE c.id = ?');
-$stmt->execute([$class_id]);
-$class = $stmt->fetch(PDO::FETCH_ASSOC);
+require_class_member($pdo, $class_id, $user['id']);
+$class = get_class_info($pdo, $class_id);
 
 // Get class members
 $stmt = $pdo->prepare('SELECT u.id, u.name, u.email, cm.role FROM class_members cm JOIN users u ON cm.user_id = u.id WHERE cm.class_id = ? ORDER BY cm.role DESC, u.name ASC');
@@ -27,66 +18,8 @@ $stmt->execute([$class_id]);
 $members = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>People | Classroom Clone</title>
-    <link rel="stylesheet" href="../style.css">
+<?php $pageTitle = 'People | Classroom Clone'; include __DIR__ . '/../includes/header.php'; ?>
     <style>
-        .class-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 40px 24px;
-            border-radius: 12px;
-            margin-bottom: 32px;
-        }
-        .class-header h1 {
-            margin: 0;
-            font-size: 32px;
-        }
-        .class-header p {
-            margin: 8px 0 0;
-            opacity: 0.9;
-        }
-        .class-meta {
-            display: flex;
-            gap: 24px;
-            margin-top: 16px;
-            font-size: 14px;
-        }
-        .tabs {
-            display: flex;
-            gap: 24px;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 24px;
-        }
-        .tab {
-            padding: 12px 0;
-            border-bottom: 3px solid transparent;
-            cursor: pointer;
-            color: var(--muted);
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-        .tab:hover {
-            color: var(--text);
-        }
-        .tab.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
-        }
-        .section-title {
-            font-weight: 600;
-            font-size: 16px;
-            color: var(--text);
-            margin-top: 28px;
-            margin-bottom: 16px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid var(--border);
-        }
         .member {
             background: white;
             padding: 16px;
@@ -137,21 +70,12 @@ $members = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <main class="content">
             <?php include __DIR__ . '/../includes/navbar.php'; ?>
 
-            <div class="class-header">
-                <h1><?php echo htmlspecialchars($class['name']); ?></h1>
-                <div class="class-meta">
-                    <?php if ($class['section']): ?>
-                        <span>Section: <?php echo htmlspecialchars($class['section']); ?></span>
-                    <?php endif; ?>
-                    <span>Total Members: <?php echo count($members); ?></span>
-                </div>
-            </div>
-
-            <div class="tabs">
-                <a href="stream.php?class_id=<?php echo $class_id; ?>" class="tab">Stream</a>
-                <a href="classwork.php?class_id=<?php echo $class_id; ?>" class="tab">Classwork</a>
-                <a href="people.php?class_id=<?php echo $class_id; ?>" class="tab active">People</a>
-            </div>
+            <?php
+            $classMeta = ['Total Members: ' . count($members)];
+            include __DIR__ . '/../includes/class_header.php';
+            $activeTab = 'people';
+            include __DIR__ . '/../includes/class_tabs.php';
+            ?>
 
             <div style="max-width: 600px;">
                 <?php
@@ -160,7 +84,7 @@ $members = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 ?>
 
                 <?php if (!empty($teachers)): ?>
-                    <div class="section-title">👨‍🏫 Teachers</div>
+                    <div class="section-title">&#x1F468;&#x200D;&#x1F3EB; Teachers</div>
                     <?php foreach ($teachers as $teacher): ?>
                         <div class="member">
                             <div class="member-avatar">
@@ -176,7 +100,7 @@ $members = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <?php endif; ?>
 
                 <?php if (!empty($students)): ?>
-                    <div class="section-title">👥 Students</div>
+                    <div class="section-title">&#x1F465; Students</div>
                     <?php foreach ($students as $student): ?>
                         <div class="member">
                             <div class="member-avatar">
@@ -193,5 +117,4 @@ $members = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
         </main>
     </div>
-</body>
-</html>
+<?php include __DIR__ . '/../includes/footer.php'; ?>

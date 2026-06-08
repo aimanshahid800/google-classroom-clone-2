@@ -10,15 +10,7 @@ if (!$assignment_id || !$class_id) {
     die('Invalid request.');
 }
 
-// Verify user is a teacher in this class
-$stmt = $pdo->prepare('
-    SELECT cm.id FROM class_members cm
-    WHERE cm.class_id = ? AND cm.user_id = ? AND cm.role = "teacher"
-');
-$stmt->execute([$class_id, $user['id']]);
-if (!$stmt->fetch()) {
-    die('Only teachers can view submissions.');
-}
+require_teacher($pdo, $class_id, $user['id'], 'Only teachers can view submissions.');
 
 // Get assignment details
 $stmt = $pdo->prepare('SELECT a.*, c.name as class_name FROM assignments a JOIN classes c ON a.class_id = c.id WHERE a.id = ? AND a.class_id = ?');
@@ -65,13 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_done'])) {
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Submissions | Classroom Clone</title>
-    <link rel="stylesheet" href="../style.css">
+<?php $pageTitle = 'View Submissions | Classroom Clone'; include __DIR__ . '/../includes/header.php'; ?>
     <style>
         .container {
             max-width: 900px;
@@ -130,25 +116,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_done'])) {
             color: var(--muted);
             margin-top: 4px;
         }
-        .submission-status {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        .status-handed-in {
-            background: #fff3cd;
-            color: #856404;
-        }
-        .status-done {
-            background: #e8f5e9;
-            color: #2e7d32;
-        }
-        .status-missing {
-            background: #ffebee;
-            color: #c62828;
-        }
         .submission-content {
             background: var(--surface-alt);
             padding: 12px;
@@ -182,11 +149,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_done'])) {
             background: #ccc;
             cursor: not-allowed;
         }
-        .empty-message {
-            padding: 40px;
-            text-align: center;
-            color: var(--muted);
-        }
         .missing-students {
             margin-top: 24px;
             padding: 20px;
@@ -219,9 +181,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_done'])) {
                 <div class="assignment-header">
                     <h1><?php echo htmlspecialchars($assignment['title']); ?></h1>
                     <div class="assignment-meta">
-                        <span>📚 Class: <?php echo htmlspecialchars($assignment['class_name']); ?></span>
+                        <span>&#x1F4DA; Class: <?php echo htmlspecialchars($assignment['class_name']); ?></span>
                         <?php if ($assignment['due_date']): ?>
-                            <span>📅 Due: <?php echo date('M d, Y • H:i', strtotime($assignment['due_date'])); ?></span>
+                            <span>&#x1F4C5; Due: <?php echo format_date($assignment['due_date']); ?></span>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -240,13 +202,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_done'])) {
                                         <div class="student-email"><?php echo htmlspecialchars($sub['email']); ?></div>
                                     </div>
                                     <div style="text-align: right;">
-                                        <div class="submission-status status-<?php echo strtolower(str_replace('_', '-', $sub['status'])); ?>">
-                                            <?php echo ucfirst(str_replace('_', ' ', $sub['status'])); ?>
+                                        <div class="status-badge status-<?php echo strtolower(str_replace('_', '-', $sub['status'])); ?>">
+                                            <?php echo format_status($sub['status']); ?>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="submission-time">
-                                    Submitted: <?php echo date('M d, Y • H:i', strtotime($sub['submitted_at'])); ?>
+                                    Submitted: <?php echo format_date($sub['submitted_at']); ?>
                                 </div>
                                 <div class="submission-content">
                                     <?php echo htmlspecialchars($sub['content']); ?>
@@ -261,22 +223,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_done'])) {
                         <?php endforeach; ?>
                     <?php else: ?>
                         <div class="empty-message">
-                            <p>📋 No submissions yet</p>
+                            <p>&#x1F4CB; No submissions yet</p>
                         </div>
                     <?php endif; ?>
                 </div>
 
                 <?php
                 $submitted_ids = array_map(function($s) { return $s['user_id']; }, $submissions);
-                $missing_students = array_filter($students, function($s) { return !in_array($s['id'], $submitted_ids); });
+                $missing_students = array_filter($students, function($s) use ($submitted_ids) { return !in_array($s['id'], $submitted_ids); });
                 ?>
 
                 <?php if (!empty($missing_students)): ?>
                     <div class="missing-students">
-                        <h3>⚠️ Missing Submissions (<?php echo count($missing_students); ?>)</h3>
+                        <h3>&#x26A0;&#xFE0F; Missing Submissions (<?php echo count($missing_students); ?>)</h3>
                         <ul class="missing-list">
                             <?php foreach ($missing_students as $student): ?>
-                                <li>👤 <?php echo htmlspecialchars($student['name']); ?> (<?php echo htmlspecialchars($student['email']); ?>)</li>
+                                <li>&#x1F464; <?php echo htmlspecialchars($student['name']); ?> (<?php echo htmlspecialchars($student['email']); ?>)</li>
                             <?php endforeach; ?>
                         </ul>
                     </div>
@@ -284,5 +246,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_done'])) {
             </div>
         </main>
     </div>
-</body>
-</html>
+<?php include __DIR__ . '/../includes/footer.php'; ?>
