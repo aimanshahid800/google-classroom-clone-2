@@ -5,16 +5,22 @@ require_login();
 $user = current_user();
 
 // Fetch all enrolled classes for the current user
-$stmt = $pdo->prepare('
-    SELECT c.id, c.name, c.section, c.subject, c.code, c.owner_id, u.name AS teacher_name
-    FROM classes c
-    JOIN class_members cm ON c.id = cm.class_id
-    JOIN users u ON c.owner_id = u.id
-    WHERE cm.user_id = ?
-    ORDER BY c.created_at DESC
-');
-$stmt->execute([$user['id']]);
-$classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$classes = [];
+try {
+    $stmt = $pdo->prepare('
+        SELECT c.id, c.name, c.section, c.subject, c.code, c.owner_id, u.name AS teacher_name
+        FROM classes c
+        JOIN class_members cm ON c.id = cm.class_id
+        JOIN users u ON c.owner_id = u.id
+        WHERE cm.user_id = ?
+        ORDER BY c.created_at DESC
+    ');
+    $stmt->execute([$user['id']]);
+    $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    error_log('Dashboard classes query failed: ' . $e->getMessage());
+    $db_error = 'Unable to load your classes. Please try again later.';
+}
 ?>
 
 <!DOCTYPE html>
@@ -168,6 +174,12 @@ $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
           <a href="../classes/join.php" class="action-btn action-btn-outline">+ Join class</a>
         </div>
       </div>
+
+      <?php if (!empty($db_error)): ?>
+        <div class="alert alert-error" style="padding: 12px; background: #ffebee; color: #c62828; border: 1px solid #ef5350; border-radius: 8px; margin-bottom: 20px;">
+          <?php echo htmlspecialchars($db_error); ?>
+        </div>
+      <?php endif; ?>
 
       <?php if (!empty($classes)): ?>
         <div class="classes-grid">

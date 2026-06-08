@@ -37,7 +37,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $errors[] = 'Email already registered.';
             }
         } catch (PDOException $e) {
-            $errors[] = 'Database error: ' . $e->getMessage();
+            error_log('Registration email check failed: ' . $e->getMessage());
+            $errors[] = 'Something went wrong. Please try again later.';
         }
     }
 
@@ -51,7 +52,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Redirect to login after 2 seconds
             echo '<meta http-equiv="refresh" content="2; url=login.php">';
         } catch (PDOException $e) {
-            $errors[] = 'Database error: ' . $e->getMessage();
+            error_log('Registration insert failed: ' . $e->getMessage());
+            $errors[] = 'Something went wrong. Please try again later.';
         }
     }
 }

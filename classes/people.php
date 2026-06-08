@@ -6,25 +6,43 @@ $user = current_user();
 $class_id = $_GET['class_id'] ?? null;
 
 if (!$class_id) {
-    die('Class not found.');
+    render_error_page('Class Not Found', 'No class was specified.', 404);
 }
 
 // Verify user is a member of this class
-$stmt = $pdo->prepare('SELECT id FROM class_members WHERE class_id = ? AND user_id = ?');
-$stmt->execute([$class_id, $user['id']]);
-if (!$stmt->fetch()) {
-    die('You do not have access to this class.');
+try {
+    $stmt = $pdo->prepare('SELECT id FROM class_members WHERE class_id = ? AND user_id = ?');
+    $stmt->execute([$class_id, $user['id']]);
+    if (!$stmt->fetch()) {
+        render_error_page('Access Denied', 'You do not have access to this class.');
+    }
+} catch (PDOException $e) {
+    error_log('People membership check failed: ' . $e->getMessage());
+    render_error_page('Error', 'Something went wrong. Please try again later.', 500);
 }
 
 // Get class info
-$stmt = $pdo->prepare('SELECT c.*, u.name AS teacher_name FROM classes c JOIN users u ON c.owner_id = u.id WHERE c.id = ?');
-$stmt->execute([$class_id]);
-$class = $stmt->fetch(PDO::FETCH_ASSOC);
+try {
+    $stmt = $pdo->prepare('SELECT c.*, u.name AS teacher_name FROM classes c JOIN users u ON c.owner_id = u.id WHERE c.id = ?');
+    $stmt->execute([$class_id]);
+    $class = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$class) {
+        render_error_page('Class Not Found', 'The requested class does not exist.', 404);
+    }
+} catch (PDOException $e) {
+    error_log('People class info query failed: ' . $e->getMessage());
+    render_error_page('Error', 'Something went wrong. Please try again later.', 500);
+}
 
 // Get class members
-$stmt = $pdo->prepare('SELECT u.id, u.name, u.email, cm.role FROM class_members cm JOIN users u ON cm.user_id = u.id WHERE cm.class_id = ? ORDER BY cm.role DESC, u.name ASC');
-$stmt->execute([$class_id]);
-$members = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$members = [];
+try {
+    $stmt = $pdo->prepare('SELECT u.id, u.name, u.email, cm.role FROM class_members cm JOIN users u ON cm.user_id = u.id WHERE cm.class_id = ? ORDER BY cm.role DESC, u.name ASC');
+    $stmt->execute([$class_id]);
+    $members = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    error_log('People members query failed: ' . $e->getMessage());
+}
 ?>
 
 <!DOCTYPE html>

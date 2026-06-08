@@ -4,7 +4,7 @@ require_login();
 
 $user = current_user();
 if ($user['role'] !== 'teacher') {
-    die('Only teachers can create classes.');
+    render_error_page('Access Denied', 'Only teachers can create classes.');
 }
 
 $errors = [];
@@ -45,7 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header('Location: stream.php?class_id=' . $class_id);
             exit;
         } catch (PDOException $e) {
-            $errors[] = 'Database error: ' . $e->getMessage();
+            error_log('Class creation failed: ' . $e->getMessage());
+            $errors[] = 'Failed to create class. Please try again later.';
         }
     }
 }
