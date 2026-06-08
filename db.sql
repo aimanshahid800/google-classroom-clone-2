@@ -65,3 +65,11 @@ CREATE TABLE announcements (
   FOREIGN KEY (class_id) REFERENCES classes(id),
   FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
+CREATE TABLE user_settings (
+  user_id INT PRIMARY KEY,
+  email_notifications TINYINT(1) NOT NULL DEFAULT 1,
+  comment_notifications TINYINT(1) NOT NULL DEFAULT 1,
+  due_date_reminders TINYINT(1) NOT NULL DEFAULT 1,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
