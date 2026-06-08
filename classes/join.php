@@ -45,101 +45,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Join Class | Classroom Clone</title>
-    <link rel="stylesheet" href="../style.css">
+<?php $pageTitle = 'Join Class | Classroom Clone'; include __DIR__ . '/../includes/header.php'; ?>
     <style>
-        .form-container {
-            max-width: 500px;
-            background: white;
-            padding: 32px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            margin: 40px auto;
-        }
-        .form-container h1 {
-            text-align: center;
-            color: var(--primary);
-            margin-bottom: 12px;
-        }
-        .form-container p {
-            text-align: center;
-            color: var(--muted);
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--text);
-        }
-        .form-group input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
+        .form-group input.code-input {
             font-size: 16px;
-            font-family: inherit;
             text-transform: uppercase;
             letter-spacing: 1px;
             text-align: center;
-        }
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
-        }
-        .alert {
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-        .alert-error {
-            background: #ffebee;
-            color: #c62828;
-            border: 1px solid #ef5350;
-        }
-        .submit-btn {
-            width: 100%;
-            padding: 12px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-        .submit-btn:hover {
-            background: #1765cc;
-        }
-        .cancel-link {
-            text-align: center;
-            margin-top: 16px;
-        }
-        .cancel-link a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 500;
-        }
-        .info-box {
-            background: var(--surface-alt);
-            padding: 16px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 13px;
-            color: var(--muted);
-            border-left: 4px solid var(--primary);
         }
     </style>
 </head>
@@ -149,26 +61,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <main class="content">
             <?php include __DIR__ . '/../includes/navbar.php'; ?>
             
-            <div class="form-container">
+            <div class="form-container" style="max-width: 500px;">
                 <h1>Join a Class</h1>
-                <p>Enter your class code to join</p>
+                <p style="text-align: center; color: var(--muted); margin-bottom: 30px; font-size: 14px;">Enter your class code to join</p>
 
-                <?php if (!empty($errors)): ?>
-                    <div class="alert alert-error">
-                        <?php foreach ($errors as $error): ?>
-                            <div>✗ <?php echo htmlspecialchars($error); ?></div>
-                        <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
+                <?php include __DIR__ . '/../includes/alerts.php'; ?>
 
                 <div class="info-box">
-                    💡 Ask your teacher for a class code. It's usually 6 letters or numbers.
+                    &#x1F4A1; Ask your teacher for a class code. It's usually 6 letters or numbers.
                 </div>
 
                 <form method="POST">
                     <div class="form-group">
                         <label for="code">Class Code</label>
-                        <input type="text" id="code" name="code" maxlength="6" placeholder="e.g., ABC123" required>
+                        <input type="text" id="code" name="code" class="code-input" maxlength="6" placeholder="e.g., ABC123" required>
                     </div>
 
                     <button type="submit" class="submit-btn">Join Class</button>
@@ -180,5 +86,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </main>
     </div>
-</body>
-</html>
+<?php include __DIR__ . '/../includes/footer.php'; ?>

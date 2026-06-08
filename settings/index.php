@@ -6,12 +6,7 @@ $user = current_user();
 // TODO: implement settings UI with notifications and profile options
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Settings | Classroom Clone</title>
-  <link rel="stylesheet" href="../style.css">
+<?php $pageTitle = 'Settings | Classroom Clone'; include __DIR__ . '/../includes/header.php'; ?>
 </head>
 <body>
   <div class="page-shell">
@@ -22,5 +17,4 @@ $user = current_user();
       <p>Profile and notification settings will be added here.</p>
     </main>
   </div>
-</body>
-</html>
+<?php include __DIR__ . '/../includes/footer.php'; ?>

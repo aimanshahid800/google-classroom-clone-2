@@ -6,12 +6,7 @@ $user = current_user();
 // TODO: implement To Do page with Assigned / Missing / Done tabs
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>To Do | Classroom Clone</title>
-  <link rel="stylesheet" href="../style.css">
+<?php $pageTitle = 'To Do | Classroom Clone'; include __DIR__ . '/../includes/header.php'; ?>
 </head>
 <body>
   <div class="page-shell">
@@ -22,5 +17,4 @@ $user = current_user();
       <p>Assigned / Missing / Done tabs will be added here.</p>
     </main>
   </div>
-</body>
-</html>
+<?php include __DIR__ . '/../includes/footer.php'; ?>
