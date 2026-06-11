@@ -301,6 +301,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php if ($submission): ?>
                         <div class="submitted-info">
                             ✓ You submitted this assignment on <?php echo date('M d, Y • H:i', strtotime($submission['submitted_at'])); ?>
+                            <?php if (!empty($submission['grade'])): ?>
+                                <strong style="margin-left: 15px;">Grade: <?php echo htmlspecialchars($submission['grade']); ?></strong>
+                            <?php endif; ?>
                         </div>
                     <?php endif; ?>
 

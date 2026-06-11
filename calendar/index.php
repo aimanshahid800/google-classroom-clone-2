@@ -83,7 +83,7 @@ foreach ($assignments as $a) {
             height: 36px;
             border: 1px solid var(--border);
             border-radius: 50%;
-            background: white;
+            background: var(--surface);
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -113,7 +113,8 @@ foreach ($assignments as $a) {
             border: 1px solid var(--border);
             border-radius: 8px;
             font-size: 14px;
-            background: white;
+            background: var(--surface);
+            color: var(--text);
             cursor: pointer;
         }
         .filter-dropdown:focus {
@@ -122,7 +123,7 @@ foreach ($assignments as $a) {
         }
         .today-btn {
             padding: 8px 16px;
-            background: white;
+            background: var(--surface);
             border: 1px solid var(--border);
             border-radius: 8px;
             cursor: pointer;
@@ -144,7 +145,7 @@ foreach ($assignments as $a) {
             overflow: hidden;
         }
         .calendar-day {
-            background: white;
+            background: var(--surface);
             min-height: 140px;
             padding: 12px;
         }

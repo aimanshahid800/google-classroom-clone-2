@@ -132,7 +132,8 @@ $grouped = groupByPeriod($items);
             border: 1px solid var(--border);
             border-radius: 8px;
             font-size: 14px;
-            background: white;
+            background: var(--surface);
+            color: var(--text);
             cursor: pointer;
         }
         .filter-dropdown:focus {
@@ -172,11 +173,11 @@ $grouped = groupByPeriod($items);
             border-bottom: 1px solid var(--border);
         }
         .todo-item {
-            background: white;
+            background: var(--surface);
             padding: 16px 20px;
             border-radius: 12px;
             margin-bottom: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            box-shadow: var(--shadow);
             display: flex;
             align-items: center;
             gap: 16px;
@@ -202,7 +203,7 @@ $grouped = groupByPeriod($items);
         }
         .todo-title {
             font-weight: 600;
-            color: var(--text);
+            color: var(--primary);
             margin-bottom: 4px;
         }
         .todo-meta {
@@ -262,7 +263,7 @@ $grouped = groupByPeriod($items);
         <?php include __DIR__ . '/../includes/sidebar.php'; ?>
         <main class="content">
             <?php include __DIR__ . '/../includes/navbar.php'; ?>
-
+    
             <div class="todo-header">
                 <h1>To Do</h1>
                 <form method="GET" style="display: flex; gap: 8px; align-items: center;">
@@ -277,13 +278,13 @@ $grouped = groupByPeriod($items);
                     </select>
                 </form>
             </div>
-
+    
             <div class="tabs">
                 <a href="?tab=assigned&class_id=<?php echo htmlspecialchars($filter_class); ?>" class="tab <?php echo $tab === 'assigned' ? 'active' : ''; ?>">Assigned</a>
                 <a href="?tab=missing&class_id=<?php echo htmlspecialchars($filter_class); ?>" class="tab <?php echo $tab === 'missing' ? 'active' : ''; ?>">Missing</a>
                 <a href="?tab=done&class_id=<?php echo htmlspecialchars($filter_class); ?>" class="tab <?php echo $tab === 'done' ? 'active' : ''; ?>">Done</a>
             </div>
-
+    
             <div style="max-width: 800px;">
                 <?php if (empty($items)): ?>
                     <div class="empty-state">

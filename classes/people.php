@@ -88,11 +88,11 @@ $members = $stmt->fetchAll(PDO::FETCH_ASSOC);
             border-bottom: 2px solid var(--border);
         }
         .member {
-            background: white;
+            background: var(--surface);
             padding: 16px;
             border-radius: 12px;
             margin-bottom: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
             display: flex;
             align-items: center;
             gap: 16px;

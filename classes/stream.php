@@ -29,23 +29,34 @@ $stmt = $pdo->prepare('
 $stmt->execute([$class_id]);
 $class = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// Handle new announcement
+// Handle new announcement or archive class
 $errors = [];
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $user['role'] === 'teacher') {
-    $message = trim($_POST['message'] ?? '');
-    if (empty($message)) {
-        $errors[] = 'Announcement message is required.';
-    } else {
+    if (isset($_POST['archive_class'])) {
         try {
-            $stmt = $pdo->prepare('
-                INSERT INTO announcements (class_id, user_id, message)
-                VALUES (?, ?, ?)
-            ');
-            $stmt->execute([$class_id, $user['id'], $message]);
-            header('Location: stream.php?class_id=' . $class_id);
+            $stmt = $pdo->prepare('UPDATE classes SET is_archived = 1 WHERE id = ? AND owner_id = ?');
+            $stmt->execute([$class_id, $user['id']]);
+            header('Location: ../home/dashboard.php');
             exit;
         } catch (PDOException $e) {
-            $errors[] = 'Error posting announcement: ' . $e->getMessage();
+            $errors[] = 'Error archiving class: ' . $e->getMessage();
+        }
+    } elseif (isset($_POST['message'])) {
+        $message = trim($_POST['message']);
+        if (empty($message)) {
+            $errors[] = 'Announcement message is required.';
+        } else {
+            try {
+                $stmt = $pdo->prepare('
+                    INSERT INTO announcements (class_id, user_id, message)
+                    VALUES (?, ?, ?)
+                ');
+                $stmt->execute([$class_id, $user['id'], $message]);
+                header('Location: stream.php?class_id=' . $class_id);
+                exit;
+            } catch (PDOException $e) {
+                $errors[] = 'Error posting announcement: ' . $e->getMessage();
+            }
         }
     }
 }
@@ -213,13 +224,18 @@ $announcements = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             <div class="class-header">
                 <h1><?php echo htmlspecialchars($class['name']); ?></h1>
-                <div class="class-meta">
-                    <?php if ($class['section']): ?>
-                        <span>Section: <?php echo htmlspecialchars($class['section']); ?></span>
-                    <?php endif; ?>
-                    <span>👨‍🏫 <?php echo htmlspecialchars($class['teacher_name']); ?></span>
-                    <span>Code: <?php echo htmlspecialchars($class['code']); ?></span>
-                </div>
+                    <div class="class-meta">
+                        <?php if ($class['section']): ?>
+                            <span>Section: <?php echo htmlspecialchars($class['section']); ?></span>
+                        <?php endif; ?>
+                        <span>👨‍🏫 <?php echo htmlspecialchars($class['teacher_name']); ?></span>
+                        <span>Code: <?php echo htmlspecialchars($class['code']); ?></span>
+                        <?php if ($user['role'] === 'teacher' && $class['owner_id'] === $user['id']): ?>
+                            <form method="POST" style="display: inline; margin-left: 20px;">
+                                <button type="submit" name="archive_class" onclick="return confirm('Archive this class?')" style="background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px;">Archive Class</button>
+                            </form>
+                        <?php endif; ?>
+                    </div>
             </div>
 
             <div class="tabs">

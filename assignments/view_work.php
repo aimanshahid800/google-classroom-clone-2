@@ -51,12 +51,18 @@ $stmt = $pdo->prepare('
 $stmt->execute([$class_id]);
 $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Mark submission as done
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_done'])) {
+// Mark submission as done or update grade
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['mark_done']) || isset($_POST['update_grade']))) {
     $submission_id = $_POST['submission_id'];
     try {
-        $stmt = $pdo->prepare('UPDATE submissions SET status = ? WHERE id = ?');
-        $stmt->execute(['done', $submission_id]);
+        if (isset($_POST['mark_done'])) {
+            $stmt = $pdo->prepare('UPDATE submissions SET status = ? WHERE id = ?');
+            $stmt->execute(['done', $submission_id]);
+        } elseif (isset($_POST['update_grade'])) {
+            $grade = $_POST['grade'];
+            $stmt = $pdo->prepare('UPDATE submissions SET grade = ? WHERE id = ?');
+            $stmt->execute([$grade, $submission_id]);
+        }
         header('Location: view_work.php?assignment_id=' . $assignment_id . '&class_id=' . $class_id);
         exit;
     } catch (PDOException $e) {
@@ -261,12 +267,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_done'])) {
                                     </a>
                                 </div>
                                 <?php endif; ?>
-                                <?php if ($sub['status'] !== 'done'): ?>
-                                    <form method="POST" style="display: inline;">
-                                        <input type="hidden" name="submission_id" value="<?php echo $sub['id']; ?>">
-                                        <button type="submit" name="mark_done" class="mark-done-btn">Mark as Done</button>
-                                    </form>
-                                <?php endif; ?>
+                                 <div style="display: flex; align-items: center; gap: 12px; margin-top: 12px;">
+                                     <?php if ($sub['status'] !== 'done'): ?>
+                                         <form method="POST" style="display: inline;">
+                                             <input type="hidden" name="submission_id" value="<?php echo $sub['id']; ?>">
+                                             <button type="submit" name="mark_done" class="mark-done-btn">Mark as Done</button>
+                                         </form>
+                                     <?php endif; ?>
+                                     
+                                     <form method="POST" style="display: inline-flex; align-items: center; gap: 8px;">
+                                         <input type="hidden" name="submission_id" value="<?php echo $sub['id']; ?>">
+                                         <input type="text" name="grade" value="<?php echo htmlspecialchars($sub['grade'] ?? ''); ?>" placeholder="Grade" style="width: 60px; padding: 5px; border: 1px solid var(--border); border-radius: 4px;">
+                                         <button type="submit" name="update_grade" class="mark-done-btn" style="background: #5f6368;">Save Grade</button>
+                                     </form>
+                                 </div>
                             </div>
                         <?php endforeach; ?>
                     <?php else: ?>

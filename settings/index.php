@@ -85,11 +85,11 @@ $profile = $stmt->fetch(PDO::FETCH_ASSOC);
             font-size: 28px;
         }
         .settings-section {
-            background: white;
+            background: var(--surface);
             border-radius: 12px;
             padding: 24px;
             margin-bottom: 24px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            box-shadow: var(--shadow);
         }
         .settings-section h2 {
             margin: 0 0 20px;

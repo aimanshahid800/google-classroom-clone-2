@@ -4,13 +4,13 @@ require_login();
 
 $user = current_user();
 
-// Fetch all enrolled classes for the current user
+// Fetch all enrolled classes for the current user (excluding archived ones)
 $stmt = $pdo->prepare('
     SELECT c.id, c.name, c.section, c.subject, c.code, c.owner_id, u.name AS teacher_name
     FROM classes c
     JOIN class_members cm ON c.id = cm.class_id
     JOIN users u ON c.owner_id = u.id
-    WHERE cm.user_id = ?
+    WHERE cm.user_id = ? AND c.is_archived = 0
     ORDER BY c.created_at DESC
 ');
 $stmt->execute([$user['id']]);
@@ -70,12 +70,14 @@ $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
       margin-bottom: 40px;
     }
     .class-card {
-      background: white;
+      background: var(--surface);
       border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      box-shadow: var(--shadow);
       transition: all 0.3s ease;
-      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--border);
     }
     .class-card:hover {
       box-shadow: 0 4px 16px rgba(0,0,0,0.15);
@@ -88,6 +90,7 @@ $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
       align-items: flex-end;
       padding: 20px;
       color: white;
+      position: relative;
     }
     .class-banner h3 {
       margin: 0;
@@ -96,6 +99,7 @@ $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     .class-info {
       padding: 20px;
+      flex: 1;
     }
     .class-section {
       font-size: 13px;
@@ -117,41 +121,107 @@ $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
       margin-bottom: 12px;
       word-break: break-all;
     }
-    .class-actions {
+    .class-footer {
       display: flex;
-      gap: 8px;
-      margin-top: 12px;
+      justify-content: space-around;
+      align-items: center;
+      padding: 12px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
     }
-    .class-action-link {
-      flex: 1;
-      padding: 8px;
-      background: var(--surface-alt);
-      border: none;
-      border-radius: 6px;
-      color: var(--primary);
-      text-decoration: none;
-      font-size: 12px;
-      font-weight: 600;
-      text-align: center;
+    .footer-icon {
+      width: 24px;
+      height: 24px;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: opacity 0.2s;
+      opacity: 0.7;
     }
-    .class-action-link:hover {
-      background: var(--primary);
-      color: white;
+    .footer-icon:hover {
+      opacity: 1;
     }
+    .menu-container {
+      position: relative;
+    }
+    .class-menu-dropdown {
+      position: absolute;
+      bottom: 100%;
+      right: 0;
+      width: 160px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      display: none;
+      z-index: 10;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .class-menu-dropdown.show {
+      display: block;
+    }
+    .menu-item {
+      padding: 10px 16px;
+      font-size: 14px;
+      color: var(--text);
+      cursor: pointer;
+      transition: background 0.2s;
+      border-bottom: 1px solid var(--border);
+    }
+    .menu-item:hover {
+      background: var(--surface-alt);
+    }
+    .menu-item.danger {
+      color: #d93025;
+    }
+    .menu-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 4px 0;
+    }
+
     .empty-state {
       text-align: center;
-      padding: 60px 20px;
+      padding: 80px 20px 40px;
       color: var(--muted);
-    }
-    .empty-state-icon {
-      font-size: 64px;
-      margin-bottom: 20px;
+      max-width: 500px;
+      margin: 0 auto;
     }
     .empty-state h2 {
-      margin: 0 0 12px;
+      margin: 0 0 24px;
       color: var(--text);
+      font-size: 18px;
+      font-weight: 400;
+    }
+    .btn-create-class {
+      background: none;
+      color: var(--primary);
+      border: none;
+      padding: 10px 16px;
+      font-weight: 500;
+      font-size: 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn-create-class:hover {
+      background: var(--primary-light);
+    }
+    .btn-join-class {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 24px;
+      font-weight: 500;
+      font-size: 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    .btn-join-class:hover {
+      background: #1557b0;
+      box-shadow: 0 1px 3px rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15);
     }
   </style>
 </head>
@@ -161,13 +231,9 @@ $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <main class="content">
       <?php include __DIR__ . '/../includes/navbar.php'; ?>
       
-      <div class="dashboard-header">
-        <h1>Classes</h1>
-        <div class="header-actions">
-          <a href="../classes/create.php" class="action-btn">+ Create class</a>
-          <a href="../classes/join.php" class="action-btn action-btn-outline">+ Join class</a>
-        </div>
-      </div>
+       <div class="dashboard-header">
+         <h1>Classes</h1>
+       </div>
 
       <?php if (!empty($classes)): ?>
         <div class="classes-grid">
@@ -192,13 +258,51 @@ $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
           <?php endforeach; ?>
         </div>
       <?php else: ?>
+        <div class="classes-help-tip" style="position: absolute; top: 20px; right: 40px; text-align: right; color: var(--muted); font-size: 13px; line-height: 1.4; pointer-events: none;">
+          <div>Don't see your classes?</div>
+          <div>Try another account.</div>
+          <svg width="45" height="45" viewBox="0 0 45 45" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: block; margin: 8px 10px 0 auto;">
+            <path d="M10,40 C15,28 28,20 38,10" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="3,3" fill="none" />
+            <path d="M30,12 L38,10 L39,18" stroke="var(--muted)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
+
         <div class="empty-state">
-          <div class="empty-state-icon">📚</div>
-          <h2>No classes yet</h2>
-          <p>Create a new class or join an existing one to get started.</p>
-          <div style="margin-top: 24px;">
-            <a href="../classes/create.php" class="action-btn" style="margin-right: 12px;">Create a class</a>
-            <a href="../classes/join.php" class="action-btn action-btn-outline">Join a class</a>
+          <!-- Beautiful SVG Window & Desk Illustration -->
+          <svg width="240" height="200" viewBox="0 0 240 200" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: block; margin: 0 auto 24px;">
+            <!-- Window Frame -->
+            <rect x="80" y="20" width="80" height="100" rx="4" stroke="#dadce0" stroke-width="2" />
+            <line x1="120" y1="20" x2="120" y2="120" stroke="#dadce0" stroke-width="2" />
+            <line x1="80" y1="70" x2="160" y2="70" stroke="#dadce0" stroke-width="2" />
+            
+            <!-- Plant in Window -->
+            <path d="M90,110 Q95,95 105,95 Q100,110 90,110 Z" fill="#81c995" opacity="0.8" />
+            <path d="M110,115 Q105,100 95,105 Q105,115 110,115 Z" fill="#81c995" opacity="0.6" />
+            
+            <!-- Yellow Mug -->
+            <rect x="145" y="100" width="22" height="20" rx="3" fill="#fbbc04" />
+            <path d="M167,104 C171,104 171,116 167,116" stroke="#fbbc04" stroke-width="3" fill="none" />
+            <path d="M145,105 L167,105" stroke="#fff" stroke-width="1" opacity="0.3" />
+            
+            <!-- Stack of Books/Notebooks -->
+            <!-- Blue Book (slanted) -->
+            <path d="M115,140 L195,120 L205,135 L125,155 Z" fill="#1a73e8" />
+            <path d="M125,155 L205,135 L208,138 L128,158 Z" fill="#d2e3fc" />
+            
+            <!-- White Paper/Book (underneath) -->
+            <path d="M135,150 L205,145 L210,152 L140,157 Z" fill="#fff" stroke="#dadce0" stroke-width="1.5" />
+            <!-- Small grey block -->
+            <rect x="175" y="150" width="20" height="12" rx="2" fill="#dadce0" transform="rotate(-5, 175, 150)" />
+            
+            <!-- Pink Sphere/Vase on the left -->
+            <circle cx="65" cy="115" r="12" fill="#ff8bcb" opacity="0.7" />
+            <rect x="63" y="100" width="4" height="5" rx="1" fill="#ff8bcb" opacity="0.7" />
+          </svg>
+
+          <h2>Add a class to get started</h2>
+          <div style="margin-top: 24px; display: flex; gap: 16px; justify-content: center; align-items: center;">
+            <a href="../classes/create.php" class="btn-create-class">Create class</a>
+            <a href="../classes/join.php" class="btn-join-class">Join class</a>
           </div>
         </div>
       <?php endif; ?>

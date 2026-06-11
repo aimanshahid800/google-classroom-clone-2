@@ -79,11 +79,11 @@ $assignments = $stmt->fetchAll(PDO::FETCH_ASSOC);
             border-bottom-color: var(--primary);
         }
         .assignment {
-            background: white;
+            background: var(--surface);
             padding: 20px;
             border-radius: 12px;
             margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
             border-left: 4px solid var(--primary);
         }
         .assignment-title {

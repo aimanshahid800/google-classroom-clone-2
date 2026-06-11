@@ -20,6 +20,7 @@ CREATE TABLE classes (
   room VARCHAR(100) DEFAULT NULL,
   code VARCHAR(10) NOT NULL UNIQUE,
   owner_id INT NOT NULL,
+  is_archived TINYINT(1) DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (owner_id) REFERENCES users(id)
 );
@@ -51,6 +52,7 @@ CREATE TABLE submissions (
   user_id INT NOT NULL,
   content TEXT,
   file_path VARCHAR(255) DEFAULT NULL,
+  grade VARCHAR(10) DEFAULT NULL,
   status ENUM('handed_in','missing','done') NOT NULL DEFAULT 'handed_in',
   submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (assignment_id) REFERENCES assignments(id),
