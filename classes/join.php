@@ -162,7 +162,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php endif; ?>
 
                 <div class="info-box">
-                    💡 Ask your teacher for a class code. It's usually 6 letters or numbers.
+                    Ask your teacher for a class code. It's usually 6 letters or numbers.
                 </div>
 
                 <form method="POST">

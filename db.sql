@@ -68,3 +68,13 @@ CREATE TABLE announcements (
   FOREIGN KEY (class_id) REFERENCES classes(id),
   FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
+CREATE TABLE comments (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  entity_id INT NOT NULL,
+  entity_type ENUM('announcement', 'assignment') NOT NULL,
+  user_id INT NOT NULL,
+  message TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);

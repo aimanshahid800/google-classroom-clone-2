@@ -116,16 +116,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin: 40px auto;
         }
         .assignment-header {
-            background: white;
+            background: #e9eef6;
             padding: 24px;
             border-radius: 12px;
             margin-bottom: 24px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: block;
+        }
+        [data-theme="dark"] .assignment-header {
+            background: #202125;
+            color: white !important;
         }
         .assignment-header h1 {
             margin: 0 0 12px;
             color: var(--primary);
+            font-size: 32px ;
         }
+        [data-theme="dark"] .assignment-header h1 {
+            color: white !important;
+        }
+
         .assignment-meta {
             display: flex;
             gap: 16px;
@@ -133,15 +143,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: var(--muted);
             margin-bottom: 12px;
         }
+        [data-theme="dark"] .assignment-meta {
+            color: white !important;
+        }
         .assignment-class {
             font-size: 13px;
             color: var(--muted);
         }
+        [data-theme="dark"] .assignment-class {
+            color: white;
+        }
         .form-container {
-            background: white;
+            background: #e9eef6;
             padding: 24px;
             border-radius: 12px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        [data-theme="dark"] .form-container {
+            background: #202125;
         }
         .form-group {
             margin-bottom: 20px;
@@ -161,6 +180,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 14px;
             resize: vertical;
             min-height: 200px;
+            background: white;
+            color: black;
+        }
+        [data-theme="dark"] .form-group textarea {
+            background: #11110f;
+            color: white;
         }
         .form-group textarea:focus {
             outline: none;
@@ -207,9 +232,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
+            transition: background 0.2s;
         }
         .submit-btn:hover {
             background: #1765cc;
+        }
+        [data-theme="dark"] .submit-btn {
+            background: #173149;
         }
         .cancel-btn {
             flex: 1;
@@ -225,9 +254,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.2s;
         }
         .cancel-btn:hover {
             background: #f0f4f9;
+        }
+        [data-theme="dark"] .cancel-btn {
+            background: transparent;
+            color: #8ab4f8;
+            border-color: #8ab4f8;
         }
         .submitted-info {
             background: #e8f5e9;
@@ -249,6 +284,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         .file-upload-area input[type="file"] {
             margin-bottom: 8px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+        .file-upload-area input[type="file"]::file-selector-button {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+            margin-right: 10px;
+        }
+        .file-upload-area input[type="file"]::file-selector-button:hover {
+            background: var(--surface-alt);
+        }
+        [data-theme="dark"] .file-upload-area input[type="file"]::file-selector-button {
+            background: #3c4043;
+            color: #e8eaed;
+            border-color: #5f6368;
+        }
+        [data-theme="dark"] .file-upload-area input[type="file"]::file-selector-button:hover {
+            background: #4a4f52;
         }
         .file-hint {
             font-size: 12px;
@@ -273,6 +333,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: var(--muted);
             font-size: 11px;
         }
+        .back-link {
+            color: black;
+        }
+        [data-theme="dark"] .back-link {
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -281,15 +347,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <main class="content">
             <?php include __DIR__ . '/../includes/navbar.php'; ?>
 
+           <div style="padding: 20px 0; text-align: left;">
+                <a href="<?php echo BASE_URL; ?>/classes/classwork.php?class_id=<?php echo $class_id; ?>" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text); font-size: 14px; font-weight: 500; transition: opacity 0.2s;" class="back-link">
+                    <img src="<?php echo BASE_URL; ?>/icons/goback.png" style="width:16px; height:16px; opacity:0.8;" alt="">
+                    Go back to classwork
+                </a>
+            </div>
+
             <div class="container">
+
+
                 <div class="assignment-header">
                     <h1><?php echo htmlspecialchars($assignment['title']); ?></h1>
-                    <div class="assignment-meta">
-                        <span>📚 <?php echo htmlspecialchars($assignment['class_name']); ?></span>
-                        <?php if ($assignment['due_date']): ?>
-                            <span>📅 Due: <?php echo date('M d, Y • H:i', strtotime($assignment['due_date'])); ?></span>
-                        <?php endif; ?>
-                    </div>
+                     <div class="assignment-meta">
+                         <span><img src="<?php echo BASE_URL; ?>/icons/books (1).png" style="width:14px; height:14px; vertical-align: middle; margin-right: 4px;" alt="book"> <?php echo htmlspecialchars($assignment['class_name']); ?></span>
+                         <?php if ($assignment['due_date']): ?>
+                             <span><img src="<?php echo BASE_URL; ?>/icons/calender-icon.svg" style="width:14px; height:14px; vertical-align: middle; margin-right: 4px;" alt="cal"> Due: <?php echo date('M d, Y • H:i', strtotime($assignment['due_date'])); ?></span>
+                         <?php endif; ?>
+                     </div>
                     <?php if (!empty($assignment['description'])): ?>
                         <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 14px; color: var(--text); line-height: 1.6;">
                             <?php echo nl2br(htmlspecialchars($assignment['description'])); ?>

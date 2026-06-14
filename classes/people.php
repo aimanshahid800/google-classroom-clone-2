@@ -80,7 +80,7 @@ $members = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
         .section-title {
             font-weight: 600;
-            font-size: 16px;
+            font-size: 32px;
             color: var(--text);
             margin-top: 28px;
             margin-bottom: 16px;
@@ -88,11 +88,11 @@ $members = $stmt->fetchAll(PDO::FETCH_ASSOC);
             border-bottom: 2px solid var(--border);
         }
         .member {
-            background: var(--surface);
-            padding: 16px;
-            border-radius: 12px;
+            background: transparent;
+            padding: 8px 0;
+            border-radius: 0;
             margin-bottom: 12px;
-            box-shadow: var(--shadow);
+            box-shadow: none;
             display: flex;
             align-items: center;
             gap: 16px;
@@ -137,59 +137,51 @@ $members = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <main class="content">
             <?php include __DIR__ . '/../includes/navbar.php'; ?>
 
-            <div class="class-header">
-                <h1><?php echo htmlspecialchars($class['name']); ?></h1>
-                <div class="class-meta">
-                    <?php if ($class['section']): ?>
-                        <span>Section: <?php echo htmlspecialchars($class['section']); ?></span>
-                    <?php endif; ?>
-                    <span>Total Members: <?php echo count($members); ?></span>
-                </div>
-            </div>
-
             <div class="tabs">
                 <a href="stream.php?class_id=<?php echo $class_id; ?>" class="tab">Stream</a>
                 <a href="classwork.php?class_id=<?php echo $class_id; ?>" class="tab">Classwork</a>
                 <a href="people.php?class_id=<?php echo $class_id; ?>" class="tab active">People</a>
             </div>
 
-            <div style="max-width: 600px;">
+            <div style="max-width: 600px; margin: 0 auto;">
                 <?php
                 $teachers = array_filter($members, function($m) { return $m['role'] === 'teacher'; });
                 $students = array_filter($members, function($m) { return $m['role'] === 'student'; });
                 ?>
 
-                <?php if (!empty($teachers)): ?>
-                    <div class="section-title">👨‍🏫 Teachers</div>
-                    <?php foreach ($teachers as $teacher): ?>
-                        <div class="member">
-                            <div class="member-avatar">
-                                <?php echo strtoupper(substr($teacher['name'], 0, 1)); ?>
-                            </div>
-                            <div class="member-info">
-                                <div class="member-name"><?php echo htmlspecialchars($teacher['name']); ?></div>
-                                <div class="member-email"><?php echo htmlspecialchars($teacher['email']); ?></div>
-                            </div>
-                            <div class="member-role">Teacher</div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
+                 <?php if (!empty($teachers)): ?>
+                     <div class="section-title">
+                         <img src="<?php echo BASE_URL; ?>/icons/teacher.png" style="width:18px; height:18px; vertical-align:middle; margin-right:8px;"> Teachers
+                     </div>
+                     <?php foreach ($teachers as $teacher): ?>
+                         <div class="member">
+                             <div class="member-avatar">
+                                 <?php echo strtoupper(substr($teacher['name'], 0, 1)); ?>
+                             </div>
+                             <div class="member-info">
+                                 <div class="member-name"><?php echo htmlspecialchars($teacher['name']); ?></div>
+                             </div>
+                         </div>
+                     <?php endforeach; ?>
+                 <?php endif; ?>
 
-                <?php if (!empty($students)): ?>
-                    <div class="section-title">👥 Students</div>
-                    <?php foreach ($students as $student): ?>
-                        <div class="member">
-                            <div class="member-avatar">
-                                <?php echo strtoupper(substr($student['name'], 0, 1)); ?>
-                            </div>
-                            <div class="member-info">
-                                <div class="member-name"><?php echo htmlspecialchars($student['name']); ?></div>
-                                <div class="member-email"><?php echo htmlspecialchars($student['email']); ?></div>
-                            </div>
-                            <div class="member-role">Student</div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
+
+                 <?php if (!empty($students)): ?>
+                     <div class="section-title">
+                         <img src="<?php echo BASE_URL; ?>/icons/student.png" style="width:18px; height:18px; vertical-align:middle; margin-right:8px;"> Students
+                     </div>
+                     <?php foreach ($students as $student): ?>
+                         <div class="member">
+                             <div class="member-avatar">
+                                 <?php echo strtoupper(substr($student['name'], 0, 1)); ?>
+                             </div>
+                             <div class="member-info">
+                                 <div class="member-name"><?php echo htmlspecialchars($student['name']); ?></div>
+                             </div>
+                         </div>
+                     <?php endforeach; ?>
+                 <?php endif; ?>
+
             </div>
         </main>
     </div>

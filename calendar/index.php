@@ -138,16 +138,20 @@ foreach ($assignments as $a) {
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 1px;
-            background: var(--border);
             border: 1px solid var(--border);
             border-radius: 12px;
             overflow: hidden;
+            background: var(--surface);
         }
         .calendar-day {
             background: var(--surface);
             min-height: 140px;
             padding: 12px;
+            border-right: 1px solid var(--border);
+            box-sizing: border-box;
+        }
+        .calendar-day:last-child {
+            border-right: none;
         }
         .day-header {
             text-align: center;

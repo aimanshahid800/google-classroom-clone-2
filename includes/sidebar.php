@@ -1,5 +1,6 @@
 <?php
 // Sidebar markup for all pages — dynamically loads enrolled classes
+$user = current_user();
 $sidebar_classes = [];
 if (!empty($_SESSION['user_id'])) {
     $stmt = $pdo->prepare('
@@ -21,10 +22,11 @@ $current_dir = basename(dirname($_SERVER['PHP_SELF']));
     <a href="<?php echo BASE_URL; ?>/home/dashboard.php" class="sidebar-link <?php echo ($current_dir === 'home') ? 'active' : ''; ?>">
       <img src="<?php echo BASE_URL; ?>/icons/Home-icon.svg" class="sidebar-icon"> <span>Home</span>
     </a>
-    <a href="<?php echo BASE_URL; ?>/calendar/index.php" class="sidebar-link <?php echo ($current_dir === 'calendar') ? 'active' : ''; ?>">
-      <img src="<?php echo BASE_URL; ?>/icons/calender-icon.svg" class="sidebar-icon"> <span>Calendar</span>
-    </a>
-  </div>
+      <a href="<?php echo BASE_URL; ?>/calendar/index.php" class="sidebar-link <?php echo ($current_dir === 'calendar') ? 'active' : ''; ?>">
+        <img src="<?php echo BASE_URL; ?>/icons/calender-icon.svg" class="sidebar-icon"> <span>Calendar</span>
+      </a>
+    </div>
+
 
   <?php if (!empty($sidebar_classes)): ?>
   <div class="sidebar-section enrolled-section">
@@ -33,12 +35,14 @@ $current_dir = basename(dirname($_SERVER['PHP_SELF']));
         <img src="<?php echo BASE_URL; ?>/icons/enrolled-icon.svg" style="width: 24px; height: 24px;">
         <span class="sidebar-heading">Enrolled</span>
       </div>
-      <span id="enrolled-arrow" class="dropdown-arrow">&#9662;</span>
+      <img src="<?php echo BASE_URL; ?>/icons/down.png" id="enrolled-arrow" class="dropdown-arrow" style="width: 12px; height: 12px;">
     </div>
     <div id="enrolled-list" class="sidebar-dropdown-content">
+      <?php if ($user['role'] === 'student'): ?>
       <a href="<?php echo BASE_URL; ?>/todo/index.php" class="sidebar-link <?php echo ($current_dir === 'todo') ? 'active' : ''; ?>">
         <img src="<?php echo BASE_URL; ?>/icons/to-do-list-icon.svg" class="sidebar-icon"> <span>To do</span>
       </a>
+      <?php endif; ?>
       <?php foreach ($sidebar_classes as $sc): ?>
         <a href="<?php echo BASE_URL; ?>/classes/stream.php?class_id=<?php echo $sc['id']; ?>" class="sidebar-link sidebar-class-link">
           <div class="class-initial-circle">
@@ -86,13 +90,19 @@ function toggleEnrolled() {
     border-bottom: none;
   }
   .sidebar-heading {
+    display: flex;
+    align-items: center;
+    gap: 16px;
     font-size: 14px;
     font-weight: 500;
-    color: var(--muted);
+    color: black;
     text-transform: none;
     letter-spacing: 0.5px;
     margin: 0;
     padding: 0;
+  }
+  [data-theme="dark"] .sidebar-heading {
+    color: white;
   }
   .sidebar-dropdown-trigger {
     display: flex;
@@ -100,10 +110,22 @@ function toggleEnrolled() {
     align-items: center;
     cursor: pointer;
     padding: 0 12px 0 28px;
+    height: 40px;
     margin-bottom: 12px;
-    transition: color 0.2s;
+    transition: all 0.2s;
+    border-radius: 0 24px 24px 0;
+    margin-right: 12px;
   }
   .sidebar-dropdown-trigger:hover {
+    background: var(--surface-alt);
+  }
+  .sidebar-dropdown-trigger.active-trigger {
+    background: var(--primary-light);
+    color: var(--primary);
+    font-weight: 600;
+  }
+  [data-theme="dark"] .sidebar-dropdown-trigger.active-trigger {
+    background: #173149;
     color: var(--primary);
   }
   .dropdown-arrow {

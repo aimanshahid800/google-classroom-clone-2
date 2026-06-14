@@ -9,7 +9,7 @@ $stmt = $pdo->prepare('
     SELECT c.id, c.name, c.section, c.subject, c.code, c.owner_id, u.name AS teacher_name
     FROM classes c
     JOIN class_members cm ON c.id = cm.class_id
-    JOIN users u ON c.owner_id = u.id
+    LEFT JOIN users u ON c.owner_id = u.id
     WHERE cm.user_id = ? AND c.is_archived = 0
     ORDER BY c.created_at DESC
 ');
@@ -98,7 +98,7 @@ $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
       font-weight: 600;
     }
     .class-info {
-      padding: 20px;
+      padding: 60px;
       flex: 1;
     }
     .class-section {
@@ -121,14 +121,15 @@ $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
       margin-bottom: 12px;
       word-break: break-all;
     }
-    .class-footer {
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      padding: 12px;
-      border-top: 1px solid var(--border);
-      background: var(--surface);
-    }
+   .class-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 50px;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+}
     .footer-icon {
       width: 24px;
       height: 24px;
@@ -179,12 +180,20 @@ $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
       margin: 4px 0;
     }
 
+    /* Empty state styled container */
     .empty-state {
       text-align: center;
       padding: 80px 20px 40px;
       color: var(--muted);
       max-width: 500px;
       margin: 0 auto;
+    }
+    .empty-state-img {
+      max-width: 300px;
+      width: 100%;
+      height: auto;
+      margin: 0 auto 24px;
+      display: block;
     }
     .empty-state h2 {
       margin: 0 0 24px;
@@ -193,35 +202,44 @@ $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
       font-weight: 400;
     }
     .btn-create-class {
-      background: none;
-      color: var(--primary);
+      background: transparent;
+      color: #1a73e8;
       border: none;
-      padding: 10px 16px;
-      font-weight: 500;
+      padding: 10px 24px;
+      font-weight: 600;
       font-size: 14px;
-      border-radius: 4px;
+      border-radius: 50px;
       cursor: pointer;
       text-decoration: none;
-      transition: background 0.2s;
+      transition: background-color 0.2s, color 0.2s;
     }
     .btn-create-class:hover {
-      background: var(--primary-light);
+      background-color: rgba(26, 115, 232, 0.08);
+      color: #1557b0;
     }
     .btn-join-class {
-      background: var(--primary);
+      background: #1a73e8;
       color: white;
       border: none;
       padding: 10px 24px;
-      font-weight: 500;
+      font-weight: 600;
       font-size: 14px;
-      border-radius: 20px;
+      border-radius: 50px;
       cursor: pointer;
       text-decoration: none;
-      transition: background 0.2s, box-shadow 0.2s;
+      transition: background-color 0.2s, box-shadow 0.2s;
     }
     .btn-join-class:hover {
       background: #1557b0;
-      box-shadow: 0 1px 3px rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15);
+      box-shadow: 0 1px 3px rgba(60,64,67,0.3);
+    }
+
+    /* Change container background based on theme when classes are empty */
+    html:not([data-theme="dark"]) body:has(.empty-state) .content {
+      background-color: #f8fafd !important;
+    }
+    html[data-theme="dark"] body:has(.empty-state) .content {
+      background-color: #1e1e1e !important;
     }
   </style>
 </head>
@@ -242,71 +260,67 @@ $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
               <div class="class-banner">
                 <h3><?php echo htmlspecialchars($class['name']); ?></h3>
               </div>
-              <div class="class-info">
-                <?php if ($class['section']): ?>
-                  <div class="class-section"><?php echo htmlspecialchars($class['section']); ?></div>
-                <?php endif; ?>
-                <div class="class-teacher">👨‍🏫 <?php echo htmlspecialchars($class['teacher_name']); ?></div>
-                <div class="class-code">Code: <strong><?php echo htmlspecialchars($class['code']); ?></strong></div>
-                <div class="class-actions">
-                  <a href="../classes/stream.php?class_id=<?php echo $class['id']; ?>" class="class-action-link">Stream</a>
-                  <a href="../classes/classwork.php?class_id=<?php echo $class['id']; ?>" class="class-action-link">Classwork</a>
-                  <a href="../classes/people.php?class_id=<?php echo $class['id']; ?>" class="class-action-link">People</a>
+               <div class="class-info">
+               </div>
+
+              <div class="class-footer">
+                <a href="../classes/stream.php?class_id=<?php echo $class['id']; ?>" title="Open Class">
+                  <img src="<?php echo BASE_URL; ?>/icons/portrait-icon.svg" class="footer-icon">
+                </a>
+                <div class="footer-icon" title="Class Folder">
+                  <img src="<?php echo BASE_URL; ?>/icons/folder icon.svg" style="width: 24px; height: 24px;">
+                </div>
+                <div class="menu-container">
+                   <img src="<?php echo BASE_URL; ?>/icons/3dots-more-icon.png" class="footer-icon" onclick="toggleClassMenu(this)">
+                   <div class="class-menu-dropdown">
+
+                    <div class="menu-item">Move</div>
+                    <div class="menu-item">Hide</div>
+                    <div class="menu-item">Unenroll</div>
+                    <div class="menu-divider"></div>
+                    <div class="menu-item danger">Report abuse</div>
+                  </div>
                 </div>
               </div>
             </div>
           <?php endforeach; ?>
         </div>
       <?php else: ?>
-        <div class="classes-help-tip" style="position: absolute; top: 20px; right: 40px; text-align: right; color: var(--muted); font-size: 13px; line-height: 1.4; pointer-events: none;">
-          <div>Don't see your classes?</div>
-          <div>Try another account.</div>
-          <svg width="45" height="45" viewBox="0 0 45 45" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: block; margin: 8px 10px 0 auto;">
-            <path d="M10,40 C15,28 28,20 38,10" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="3,3" fill="none" />
-            <path d="M30,12 L38,10 L39,18" stroke="var(--muted)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </div>
-
         <div class="empty-state">
-          <!-- Beautiful SVG Window & Desk Illustration -->
-          <svg width="240" height="200" viewBox="0 0 240 200" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: block; margin: 0 auto 24px;">
-            <!-- Window Frame -->
-            <rect x="80" y="20" width="80" height="100" rx="4" stroke="#dadce0" stroke-width="2" />
-            <line x1="120" y1="20" x2="120" y2="120" stroke="#dadce0" stroke-width="2" />
-            <line x1="80" y1="70" x2="160" y2="70" stroke="#dadce0" stroke-width="2" />
-            
-            <!-- Plant in Window -->
-            <path d="M90,110 Q95,95 105,95 Q100,110 90,110 Z" fill="#81c995" opacity="0.8" />
-            <path d="M110,115 Q105,100 95,105 Q105,115 110,115 Z" fill="#81c995" opacity="0.6" />
-            
-            <!-- Yellow Mug -->
-            <rect x="145" y="100" width="22" height="20" rx="3" fill="#fbbc04" />
-            <path d="M167,104 C171,104 171,116 167,116" stroke="#fbbc04" stroke-width="3" fill="none" />
-            <path d="M145,105 L167,105" stroke="#fff" stroke-width="1" opacity="0.3" />
-            
-            <!-- Stack of Books/Notebooks -->
-            <!-- Blue Book (slanted) -->
-            <path d="M115,140 L195,120 L205,135 L125,155 Z" fill="#1a73e8" />
-            <path d="M125,155 L205,135 L208,138 L128,158 Z" fill="#d2e3fc" />
-            
-            <!-- White Paper/Book (underneath) -->
-            <path d="M135,150 L205,145 L210,152 L140,157 Z" fill="#fff" stroke="#dadce0" stroke-width="1.5" />
-            <!-- Small grey block -->
-            <rect x="175" y="150" width="20" height="12" rx="2" fill="#dadce0" transform="rotate(-5, 175, 150)" />
-            
-            <!-- Pink Sphere/Vase on the left -->
-            <circle cx="65" cy="115" r="12" fill="#ff8bcb" opacity="0.7" />
-            <rect x="63" y="100" width="4" height="5" rx="1" fill="#ff8bcb" opacity="0.7" />
-          </svg>
-
+          <img src="<?php echo BASE_URL; ?>/icons/no preview window.png" class="empty-state-img" alt="No classes started">
           <h2>Add a class to get started</h2>
           <div style="margin-top: 24px; display: flex; gap: 16px; justify-content: center; align-items: center;">
-            <a href="../classes/create.php" class="btn-create-class">Create class</a>
-            <a href="../classes/join.php" class="btn-join-class">Join class</a>
+            <?php if ($user && $user['role'] === 'student'): ?>
+              <a href="#" class="btn-create-class" onclick="openStudentModal('create'); return false;">Create class</a>
+              <a href="#" class="btn-join-class" onclick="openStudentModal('join'); return false;">Join class</a>
+            <?php else: ?>
+              <a href="../classes/create.php" class="btn-create-class">Create class</a>
+              <a href="../classes/join.php" class="btn-join-class">Join class</a>
+            <?php endif; ?>
           </div>
         </div>
       <?php endif; ?>
     </main>
   </div>
 </body>
+<script>
+function toggleClassMenu(element) {
+    const dropdown = element.nextElementSibling;
+    
+    // Close all other dropdowns first
+    document.querySelectorAll('.class-menu-dropdown').forEach(menu => {
+        if (menu !== dropdown) menu.classList.remove('show');
+    });
+    
+    dropdown.classList.toggle('show');
+}
+
+window.onclick = function(event) {
+    if (!event.target.closest('.menu-container')) {
+        document.querySelectorAll('.class-menu-dropdown').forEach(menu => {
+            menu.classList.remove('show');
+        });
+    }
+}
+</script>
 </html>

@@ -84,11 +84,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['mark_done']) || isse
             margin: 40px auto;
         }
         .assignment-header {
-            background: white;
+            background: #e9eef6;
             padding: 24px;
             border-radius: 12px;
             margin-bottom: 24px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        [data-theme="dark"] .assignment-header {
+            background: #202125;
         }
         .assignment-header h1 {
             margin: 0 0 12px;
@@ -101,18 +104,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['mark_done']) || isse
             color: var(--muted);
         }
         .submissions-container {
-            background: white;
+            background: #e9eef6;
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
+        [data-theme="dark"] .submissions-container {
+            background: #202125;
+        }
         .submissions-header {
             padding: 20px 24px;
             border-bottom: 1px solid var(--border);
-            background: var(--surface-alt);
+            background: #e9eef6;
             display: flex;
             justify-content: space-between;
             align-items: center;
+        }
+        [data-theme="dark"] .submissions-header {
+            background: #202125;
         }
         .submission-item {
             padding: 20px 24px;
@@ -191,7 +200,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['mark_done']) || isse
         .empty-message {
             padding: 40px;
             text-align: center;
-            color: var(--muted);
+            color: var(--text);
+            background: #f1f3f4;
+            border-radius: 12px;
+        }
+        [data-theme="dark"] .empty-message {
+            background: #2d2e31;
+            color: white;
+            border-radius: 12px;
         }
         .missing-students {
             margin-top: 24px;
@@ -199,9 +215,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['mark_done']) || isse
             background: #ffebee;
             border-radius: 12px;
         }
+        [data-theme="dark"] .missing-students {
+            background: #880005;
+            color: white;
+        }
         .missing-students h3 {
             margin: 0 0 12px;
             color: #c62828;
+        }
+        [data-theme="dark"] .missing-students h3 {
+            color: white;
         }
         .missing-list {
             list-style: none;
@@ -213,6 +236,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['mark_done']) || isse
             color: #c62828;
             font-size: 13px;
         }
+        [data-theme="dark"] .missing-list li {
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -220,14 +246,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['mark_done']) || isse
         <?php include __DIR__ . '/../includes/sidebar.php'; ?>
         <main class="content">
             <?php include __DIR__ . '/../includes/navbar.php'; ?>
+            
+            <div style="padding: 20px 24px 0; text-align: left;">
+                <a href="<?php echo BASE_URL; ?>/classes/classwork.php?class_id=<?php echo $class_id; ?>" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text); font-size: 14px; font-weight: 500; transition: opacity 0.2s;" class="back-link">
+                    <img src="<?php echo BASE_URL; ?>/icons/goback.png" style="width:16px; height:16px; opacity:0.8;" alt="">
+                    Back To Classwork
+                </a>
+            </div>
 
             <div class="container">
                 <div class="assignment-header">
                     <h1><?php echo htmlspecialchars($assignment['title']); ?></h1>
                     <div class="assignment-meta">
-                        <span>📚 Class: <?php echo htmlspecialchars($assignment['class_name']); ?></span>
+                        <span><img src="<?php echo BASE_URL; ?>/icons/books (1).png" style="width:14px; height:14px; vertical-align: middle; margin-right: 4px;" alt="book"> Class: <?php echo htmlspecialchars($assignment['class_name']); ?></span>
                         <?php if ($assignment['due_date']): ?>
-                            <span>📅 Due: <?php echo date('M d, Y • H:i', strtotime($assignment['due_date'])); ?></span>
+                            <span><img src="<?php echo BASE_URL; ?>/icons/calender-icon.svg" style="width:14px; height:14px; vertical-align: middle; margin-right: 4px;" alt="cal"> Due: <?php echo date('M d, Y • H:i', strtotime($assignment['due_date'])); ?></span>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -285,7 +318,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['mark_done']) || isse
                         <?php endforeach; ?>
                     <?php else: ?>
                         <div class="empty-message">
-                            <p>📋 No submissions yet</p>
+                            <p><img src="<?php echo BASE_URL; ?>/icons/books (2).png" style="width:24px; height:24px; vertical-align: middle; margin-right: 8px;" alt="book"> No submissions yet</p>
                         </div>
                     <?php endif; ?>
                 </div>

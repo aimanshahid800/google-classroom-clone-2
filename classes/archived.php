@@ -38,10 +38,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['unarchive_class'])) {
     <title>Archived Classes | Classroom Clone</title>
     <link rel="stylesheet" href="../style.css">
     <style>
-        .container {
-            max-width: 1000px;
-            margin: 40px auto;
-        }
         .archived-header {
             display: flex;
             justify-content: space-between;
@@ -58,11 +54,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['unarchive_class'])) {
             gap: 24px;
         }
         .class-card {
-            background: white;
+            background: var(--surface);
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             opacity: 0.8;
+            border: 1px solid var(--border);
         }
         .class-banner {
             height: 120px;
@@ -98,12 +95,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['unarchive_class'])) {
         }
         .empty-state {
             text-align: center;
-            padding: 60px 20px;
+            padding: 100px 20px;
             color: var(--muted);
         }
-        .empty-state-icon {
-            font-size: 64px;
-            margin-bottom: 20px;
+        .empty-state-img {
+            max-width: 400px;
+            width: 100%;
+            height: auto;
+            margin: 0 auto 24px;
+            display: block;
+            transition: filter 0.3s ease, opacity 0.3s ease;
+        }
+        
+        /* Apply filters for empty illustration states based on theme */
+        html:not([data-theme="dark"]) .empty-state-img {
+            opacity: 0.5;
+            filter: grayscale(60%);
+        }
+        
+        html[data-theme="dark"] .empty-state-img {
+            filter: grayscale(100%) brightness(0.6);
         }
     </style>
 </head>
@@ -113,39 +124,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['unarchive_class'])) {
         <main class="content">
             <?php include __DIR__ . '/../includes/navbar.php'; ?>
             
-            <div class="container">
-                <div class="archived-header">
-                    <h1>Archived Classes</h1>
-                    <a href="../home/dashboard.php" class="action-btn" style="text-decoration: none; font-size: 14px;">Back to Dashboard</a>
-                </div>
-
-                <?php if (!empty($classes)): ?>
-                    <div class="classes-grid">
-                        <?php foreach ($classes as $class): ?>
-                            <div class="class-card">
-                                <div class="class-banner">
-                                    <h3><?php echo htmlspecialchars($class['name']); ?></h3>
-                                </div>
-                                <div class="class-info">
-                                    <div class="class-teacher">👨‍🏫 <?php echo htmlspecialchars($class['teacher_name']); ?></div>
-                                    <?php if ($class['owner_id'] === $user['id']): ?>
-                                        <form method="POST">
-                                            <input type="hidden" name="class_id" value="<?php echo $class['id']; ?>">
-                                            <button type="submit" name="unarchive_class" class="unarchive-btn">Unarchive</button>
-                                        </form>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                <?php else: ?>
-                    <div class="empty-state">
-                        <div class="empty-state-icon">📦</div>
-                        <h2>No archived classes</h2>
-                        <p>Classes you archive will appear here.</p>
-                    </div>
-                <?php endif; ?>
+            <div class="archived-header">
+                <h1>Archived Classes</h1>
+                <a href="../home/dashboard.php" class="action-btn" style="text-decoration: none; font-size: 14px;">Back to Dashboard</a>
             </div>
+
+            <?php if (!empty($classes)): ?>
+                <div class="classes-grid">
+                    <?php foreach ($classes as $class): ?>
+                        <div class="class-card">
+                            <div class="class-banner">
+                                <h3><?php echo htmlspecialchars($class['name']); ?></h3>
+                            </div>
+                            <div class="class-info">
+                                <div class="class-teacher"><?php echo htmlspecialchars($class['teacher_name']); ?></div>
+                                <?php if ($class['owner_id'] === $user['id']): ?>
+                                    <form method="POST">
+                                        <input type="hidden" name="class_id" value="<?php echo $class['id']; ?>">
+                                        <button type="submit" name="unarchive_class" class="unarchive-btn">Unarchive</button>
+                                    </form>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php else: ?>
+                <div class="empty-state">
+                    <img src="<?php echo BASE_URL; ?>/icons/no preview window.png" class="empty-state-img" alt="No archived classes">
+                    <h2>No archived classes</h3>
+                </div>
+            <?php endif; ?>
         </main>
     </div>
 </body>
