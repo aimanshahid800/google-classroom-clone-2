@@ -115,13 +115,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['mark_done']) || isse
         .submissions-header {
             padding: 20px 24px;
             border-bottom: 1px solid var(--border);
-            background: #e9eef6;
+            background: var(--surface-alt);
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-        [data-theme="dark"] .submissions-header {
-            background: #202125;
         }
         .submission-item {
             padding: 20px 24px;
@@ -201,11 +198,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['mark_done']) || isse
             padding: 40px;
             text-align: center;
             color: var(--text);
-            background: #f1f3f4;
-            border-radius: 12px;
         }
         [data-theme="dark"] .empty-message {
-            background: #2d2e31;
+            background: #11110f;
             color: white;
             border-radius: 12px;
         }
@@ -245,16 +240,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['mark_done']) || isse
     <div class="page-shell">
         <?php include __DIR__ . '/../includes/sidebar.php'; ?>
         <main class="content">
-            <?php include __DIR__ . '/../includes/navbar.php'; ?>
-            
-            <div style="padding: 20px 24px 0; text-align: left;">
-                <a href="<?php echo BASE_URL; ?>/classes/classwork.php?class_id=<?php echo $class_id; ?>" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text); font-size: 14px; font-weight: 500; transition: opacity 0.2s;" class="back-link">
-                    <img src="<?php echo BASE_URL; ?>/icons/goback.png" style="width:16px; height:16px; opacity:0.8;" alt="">
-                    Back To Classwork
-                </a>
-            </div>
+            <?php include __DIR__ . '/../includes/navbar.php'; ?>   
 
             <div class="container">
+                <div style="padding: 20px 0; text-align: left;">
+                    <a href="<?php echo BASE_URL; ?>/classes/classwork.php?class_id=<?php echo $class_id; ?>" style="display: inline-flex; align-items:center;gap:8px; text-decoration: none; color: var(--text); font-size: 14px; font-weight: 500; transition: opacity 0.2s;" class="back-link">
+                        <img src="<?php echo BASE_URL; ?>/icons/goback.png" style="width:16px; height:16px; opacity:0.8;" alt="">
+                        Back To Classwork
+                    </a>
+                </div>
                 <div class="assignment-header">
                     <h1><?php echo htmlspecialchars($assignment['title']); ?></h1>
                     <div class="assignment-meta">
