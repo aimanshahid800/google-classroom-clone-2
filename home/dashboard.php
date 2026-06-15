@@ -10,7 +10,7 @@ $stmt = $pdo->prepare('
     FROM classes c
     JOIN class_members cm ON c.id = cm.class_id
     LEFT JOIN users u ON c.owner_id = u.id
-    WHERE cm.user_id = ? AND c.is_archived = 0
+    WHERE cm.user_id = ? AND c.is_archived = 0 AND cm.is_archived = 0
     ORDER BY c.created_at DESC
 ');
 $stmt->execute([$user['id']]);
@@ -183,13 +183,13 @@ $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     /* Empty state styled container */
     .empty-state {
       text-align: center;
-      padding: 80px 20px 40px;
+      padding: 40px 20px 40px;
       color: var(--muted);
       max-width: 500px;
       margin: 0 auto;
     }
     .empty-state-img {
-      max-width: 300px;
+      max-width: 350px;
       width: 100%;
       height: auto;
       margin: 0 auto 24px;
@@ -257,9 +257,10 @@ $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="classes-grid">
           <?php foreach ($classes as $class): ?>
             <div class="class-card">
-              <div class="class-banner">
-                <h3><?php echo htmlspecialchars($class['name']); ?></h3>
-              </div>
+               <div class="class-banner" style="background: <?php echo generateGradient($class['name']); ?>;">
+                 <h3><?php echo htmlspecialchars($class['name']); ?></h3>
+               </div>
+
                <div class="class-info">
                </div>
 
@@ -272,14 +273,20 @@ $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
                 <div class="menu-container">
                    <img src="<?php echo BASE_URL; ?>/icons/3dots-more-icon.png" class="footer-icon" onclick="toggleClassMenu(this)">
-                   <div class="class-menu-dropdown">
+                    <div class="class-menu-dropdown">
+                      <form action="../classes/manage.php" method="POST" style="display: contents;">
+                        <input type="hidden" name="class_id" value="<?php echo $class['id']; ?>">
+                        <button type="submit" name="action" value="archive" class="menu-item" style="width: 100%; text-align: left; background: none; border: none; font: inherit;">
+                          Move to Archive
+                        </button>
+                        <?php if ($user['role'] === 'teacher' && $class['owner_id'] == $user['id']): ?>
+                          <button type="submit" name="action" value="delete" class="menu-item danger" style="width: 100%; text-align: left; background: none; border: none; font: inherit;" onclick="return confirm('Delete this class permanently?')">
+                            Delete
+                          </button>
+                        <?php endif; ?>
+                      </form>
+                    </div>
 
-                    <div class="menu-item">Move</div>
-                    <div class="menu-item">Hide</div>
-                    <div class="menu-item">Unenroll</div>
-                    <div class="menu-divider"></div>
-                    <div class="menu-item danger">Report abuse</div>
-                  </div>
                 </div>
               </div>
             </div>

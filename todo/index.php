@@ -346,9 +346,26 @@ $total_items = count($items);
             padding: 20px 16px;
             text-align: center;
         }
-        .empty-state img { width: 500px; opacity: 0.8; margin-bottom: 20px; }
-        .empty-state-title { font-size: 16px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
-        .empty-state-sub { font-size: 13px; color: var(--muted); }
+        .empty-state img { 
+            width: 400px; 
+            opacity: 0.8; 
+            margin-bottom: 20px; 
+            transition: filter 0.3s ease;
+        }
+        [data-theme="dark"] .empty-state img {
+            filter: brightness(0.8) contrast(0.8) opacity(0.8);
+        }
+        .empty-state-title { 
+            font-size: 16px; 
+            font-weight: 500; 
+            color: #5f6368; 
+            margin-bottom: 6px; 
+        }
+        .empty-state-sub { 
+            font-size: 13px; 
+            color: #5f6368; 
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -400,14 +417,21 @@ $total_items = count($items);
                 </div>
 
                 <!-- CONTENT -->
-                <?php if ($total_items === 0 && $tab === 'assigned'): ?>
-                    <!-- Empty state only on assigned tab -->
+                <?php if ($total_items === 0): ?>
+                    <!-- Dynamic Empty State based on tab -->
                     <div class="empty-state">
-                        <img src="<?= BASE_URL ?>/icons/forEmptyTodo.png" alt="Nothing to do">
-                        <div class="empty-state-title">Nothing on your to-do list right now</div>
-                        <div class="empty-state-sub">Check back later for new assignments</div>
+                        <?php if ($tab === 'assigned'): ?>
+                            <img src="<?= BASE_URL ?>/icons/forEmptyAssigned.png" alt="Nothing to do">
+                            <div class="empty-state-title">Nothing on your to-do list right now</div>
+                            <div class="empty-state-sub">Check back later for new assignments</div>
+                        <?php elseif ($tab === 'missing'): ?>
+                            <img src="<?= BASE_URL ?>/icons/emptyMissing.png" alt="Nothing missing">
+                            <div class="empty-state-title">Looks like nothing is missing. Nice work!</div>
+                        <?php else: ?>
+                            <img src="<?= BASE_URL ?>/icons/emptyDone.png" alt="Nothing done">
+                            <div class="empty-state-title">Your work will show here once it’s turned <br/>in or marked as done</div>
+                        <?php endif; ?>
                     </div>
-
                 <?php else: ?>
                     <?php foreach ($grouped as $period => $group_items):
                         $count = count($group_items);
@@ -428,8 +452,8 @@ $total_items = count($items);
                                 $overdue = $due_obj && $due_obj < $now_obj && $tab !== 'done';
                             ?>
                             <a class="asgn-row"
-                               href="<?= BASE_URL ?>/assignments/submit.php?assignment_id=<?= $item['id'] ?>&class_id=<?= $item['class_id'] ?>"
-                               data-class-id="<?= $item['class_id'] ?>">
+                                href="<?= BASE_URL ?>/assignments/submit.php?assignment_id=<?= $item['id'] ?>&class_id=<?= $item['class_id'] ?>"
+                                data-class-id="<?= $item['class_id'] ?>">
                                 <img class="asgn-clip-icon" src="<?= BASE_URL ?>/icons/Clipboard.png" alt="">
                                 <div class="asgn-info">
                                     <div class="asgn-title"><?= htmlspecialchars($item['title']) ?></div>
@@ -448,6 +472,7 @@ $total_items = count($items);
                     </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
+
             </div><!-- /todo-main-content -->
 
         </div><!-- /todo-page -->

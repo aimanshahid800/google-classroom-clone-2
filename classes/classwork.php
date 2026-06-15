@@ -231,8 +231,35 @@ $assignments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         .empty-message {
             text-align: center;
-            padding: 40px 20px;
+            padding: 80px 20px;
             color: var(--muted);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .empty-message img {
+            max-width: 350px;
+            width: 100%;
+            height: auto;
+            margin: 0 auto 24px;
+            display: block;
+            transition: filter 0.3s ease;
+        }
+        [data-theme="dark"] .empty-message img {
+            filter: brightness(0.8) contrast(0.8) opacity(0.8);
+        }
+        .empty-state-title { 
+            font-size: 18px; 
+            font-weight: 500; 
+            color: #5f6368; 
+            margin-bottom: 8px;
+            margin-top: 0;
+        }
+        .empty-state-sub { 
+            font-size: 14px; 
+            color: #5f6368; 
+            line-height: 1.5;
+            max-width: 400px;
+            margin: 0 auto;
         }
     </style>
 </head>
@@ -336,7 +363,14 @@ $assignments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php endforeach; ?>
                 <?php else: ?>
                     <div class="empty-message">
-                        <p>No assignments yet</p>
+                        <?php if ($user['role'] === 'teacher'): ?>
+                            <img src="<?php echo BASE_URL; ?>/icons/emptyClassworkTeacher.png" alt="No assignments">
+                            <div class="empty-state-title">This is where you'll assign work</div>
+                            <div class="empty-state-sub">You can add assignments and other work for the class,<br>then organise it into topics</div>
+                        <?php else: ?>
+                            <img src="<?php echo BASE_URL; ?>/icons/emptyClassworkStudent.png" alt="No assignments">
+                            <div class="empty-state-title">No assignments yet. Lucky you!</div>
+                        <?php endif; ?>
                     </div>
                 <?php endif; ?>
             </div>

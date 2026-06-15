@@ -32,7 +32,7 @@ $current_dir = basename(dirname($_SERVER['PHP_SELF']));
   <div class="sidebar-section enrolled-section">
     <div class="sidebar-dropdown-trigger" onclick="toggleEnrolled()">
       <div style="display: flex; align-items: center; gap: 8px;">
-        <img src="<?php echo BASE_URL; ?>/icons/enrolled-icon.svg" style="width: 24px; height: 24px;">
+        <img src="<?php echo BASE_URL; ?>/icons/enrolled-icon.svg" style="width: 22px; height: 24px;">
         <span class="sidebar-heading">Enrolled</span>
       </div>
       <img src="<?php echo BASE_URL; ?>/icons/down.png" id="enrolled-arrow" class="dropdown-arrow" style="width: 12px; height: 12px;">
@@ -43,20 +43,21 @@ $current_dir = basename(dirname($_SERVER['PHP_SELF']));
         <img src="<?php echo BASE_URL; ?>/icons/to-do-list-icon.svg" class="sidebar-icon"> <span>To do</span>
       </a>
       <?php endif; ?>
-      <?php foreach ($sidebar_classes as $sc): ?>
-        <a href="<?php echo BASE_URL; ?>/classes/stream.php?class_id=<?php echo $sc['id']; ?>" class="sidebar-link sidebar-class-link">
-          <div class="class-initial-circle">
-            <?php echo strtoupper(substr($sc['name'], 0, 1)); ?>
-          </div>
-          <span><?php echo htmlspecialchars($sc['name']); ?></span>
-        </a>
-      <?php endforeach; ?>
+          <?php foreach ($sidebar_classes as $sc): ?>
+            <a href="<?php echo BASE_URL; ?>/classes/stream.php?class_id=<?php echo $sc['id']; ?>" class="sidebar-link sidebar-class-link">
+              <div class="class-initial-circle" style="background: <?php echo generateColor($sc['name']); ?>;">
+                <?php echo strtoupper(substr($sc['name'], 0, 1)); ?>
+              </div>
+              <span><?php echo htmlspecialchars($sc['name']); ?></span>
+            </a>
+          <?php endforeach; ?>
+
     </div>
   </div>
   <?php endif; ?>
 
   <div class="sidebar-section">
-    <a href="<?php echo BASE_URL; ?>/classes/archived.php" class="sidebar-link <?php echo ($current_page === 'archived.php') ? 'active' : ''; ?>">
+    <a href="<?php echo BASE_URL; ?>/home/archived_classes.php" class="sidebar-link <?php echo ($current_page === 'archived_classes.php') ? 'active' : ''; ?>">
       <img src="<?php echo BASE_URL; ?>/icons/archive-icon.svg" class="sidebar-icon"> <span>Archived classes</span>
     </a>
     <a href="<?php echo BASE_URL; ?>/settings/index.php" class="sidebar-link <?php echo ($current_dir === 'settings') ? 'active' : ''; ?>">
@@ -83,7 +84,7 @@ function toggleEnrolled() {
 <style>
   .sidebar-section {
     margin-bottom: 20px;
-    padding-bottom: 16px;
+    padding-bottom: 18px;
     border-bottom: 1px solid var(--border);
   }
   .sidebar-section:last-child {
