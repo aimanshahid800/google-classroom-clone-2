@@ -1,6 +1,7 @@
 # 🎓 Google Classroom Clone
 
-A fully functional Google Classroom clone built as a university semester project by a team of 4.
+- Built to demonstrate full-stack PHP/MySQL skills as part of university coursework.
+- A fully functional Google Classroom clone built as a university semester project by a team of 4.
 
 ![PHP](https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white)
 ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
