@@ -27,23 +27,23 @@ A fully functional Google Classroom clone built as a university semester project
 
 ## 🗂️ Project Structure
 
+```
 google-classroom-clone-2/
-├── 📁 assignments/ — Create, submit, view & grade assignments
-├── 📁 auth/ — Login, register, logout
-├── 📁 calendar/ — Calendar UI
-├── 📁 classes/ — Stream, classwork, people, announcements
-├── 📁 home/ — Dashboard & archived classes
-├── 📁 icons/ — Icon assets
-├── 📁 includes/ — Shared navbar & sidebar
-├── 📁 settings/ — Settings page
-├── 📁 todo/ — To-do list
-├── 📁 uploads/ — Uploaded files storage
-├── ⚙️ config.php — Database connection & shared config
-├── 🗃️ db.sql — Full database schema
-├── 🏠 index.php — Entry point
-└── 🎨 style.css — Shared styles & theme variables
-
----
+├── 📁 assignments/       — Create, submit, view & grade assignments
+├── 📁 auth/              — Login, register, logout
+├── 📁 calendar/          — Calendar UI
+├── 📁 classes/           — Stream, classwork, people, announcements
+├── 📁 home/              — Dashboard & archived classes
+├── 📁 icons/             — Icon assets
+├── 📁 includes/          — Shared navbar & sidebar
+├── 📁 settings/          — Settings page
+├── 📁 todo/              — To-do list
+├── 📁 uploads/           — Uploaded files storage
+├── ⚙️ config.php         — Database connection & shared config
+├── 🗃️ db.sql             — Full database schema
+├── 🏠 index.php          — Entry point
+└── 🎨 style.css          — Shared styles & theme variables
+```
 
 ## 🛠️ Tech Stack
 
