@@ -12,45 +12,36 @@ A fully functional Google Classroom clone built with PHP, MySQL, and HTML/CSS as
 ## Project Structure
 
 google-classroom-clone-2/
-├── assignments/
-│ ├── create.php
-│ ├── delete_assignment.php
-│ ├── submit.php
-│ └── view_work.php
-├── auth/
-│ ├── login.php
-│ ├── logout.php
-│ └── register.php
-├── calendar/
-│ └── index.php
-├── classes/
-│ ├── add_comment.php
-│ ├── archived.php
-│ ├── classwork.php
-│ ├── create.php
-│ ├── delete_announcement.php
-│ ├── get_comments.php
-│ ├── join.php
-│ ├── manage.php
-│ ├── people.php
-│ └── stream.php
-├── home/
-│ ├── archived_classes.php
-│ └── dashboard.php
-├── icons/
-├── includes/
-│ ├── navbar.php
-│ └── sidebar.php
-├── settings/
-│ └── index.php
-├── todo/
-│ └── index.php
-├── uploads/
-├── config.php
-├── db.sql
-├── index.php
-├── README.md
-└── style.css
+
+├── assignments/ — Create, submit, and view assignments
+
+├── auth/ — Login, register, logout
+
+├── calendar/ — Calendar UI
+
+├── classes/ — Stream, classwork, people, announcements, comments
+
+├── home/ — Dashboard and archived classes
+
+├── icons/ — Icon assets
+
+├── includes/ — Shared navbar and sidebar
+
+├── settings/ — Settings page
+
+├── todo/ — To-do list with tabs
+
+├── uploads/ — Uploaded files storage
+
+├── config.php — Database connection and shared config
+
+├── db.sql — Full database schema
+
+├── index.php — Entry point
+
+├── style.css — Shared styles and theme variables
+
+└── README.md — Project documentation
 
 ## Features
 
