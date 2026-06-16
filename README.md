@@ -29,20 +29,45 @@ A fully functional Google Classroom clone built as a university semester project
 
 ```
 google-classroom-clone-2/
-├── 📁 assignments/       — Create, submit, view & grade assignments
-├── 📁 auth/              — Login, register, logout
-├── 📁 calendar/          — Calendar UI
-├── 📁 classes/           — Stream, classwork, people, announcements
-├── 📁 home/              — Dashboard & archived classes
-├── 📁 icons/             — Icon assets
-├── 📁 includes/          — Shared navbar & sidebar
-├── 📁 settings/          — Settings page
-├── 📁 todo/              — To-do list
-├── 📁 uploads/           — Uploaded files storage
-├── ⚙️ config.php         — Database connection & shared config
-├── 🗃️ db.sql             — Full database schema
-├── 🏠 index.php          — Entry point
-└── 🎨 style.css          — Shared styles & theme variables
+├── 📁 assignments/
+│   ├── 📄 create.php
+│   ├── 📄 delete_assignment.php
+│   ├── 📄 submit.php
+│   └── 📄 view_work.php
+├── 📁 auth/
+│   ├── 📄 login.php
+│   ├── 📄 logout.php
+│   └── 📄 register.php
+├── 📁 calendar/
+│   └── 📄 index.php
+├── 📁 classes/
+│   ├── 📄 add_comment.php
+│   ├── 📄 archived.php
+│   ├── 📄 classwork.php
+│   ├── 📄 create.php
+│   ├── 📄 delete_announcement.php
+│   ├── 📄 get_comments.php
+│   ├── 📄 join.php
+│   ├── 📄 manage.php
+│   ├── 📄 people.php
+│   └── 📄 stream.php
+├── 📁 home/
+│   ├── 📄 archived_classes.php
+│   └── 📄 dashboard.php
+├── 📁 icons/
+├── 📁 includes/
+│   ├── 📄 navbar.php
+│   └── 📄 sidebar.php
+├── 📁 settings/
+│   └── 📄 index.php
+├── 📁 todo/
+│   └── 📄 index.php
+├── 📁 uploads/
+├── ⚙️ config.php
+├── 🗃️ db.sql
+├── 🏠 index.php
+├── 📖 README.md
+└── 🎨 style.css
 ```
 
 ## 🛠️ Tech Stack
