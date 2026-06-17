@@ -94,7 +94,7 @@ git clone https://github.com/aimanshahid800/google-classroom-clone-2.git
 3. Configure your DB credentials in `config.php`
 4. Start Apache & MySQL in XAMPP
 5. Open in browser:
-   http://localhost/Uni-Team-Project/google-classroom-clone-2/
+   http://localhost/google-classroom-clone-2/
 
 ---
 
