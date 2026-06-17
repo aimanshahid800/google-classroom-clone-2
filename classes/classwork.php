@@ -103,7 +103,7 @@ $assignments = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .assignment-right {
             display: flex;
             flex-direction: column;
-            align-items: center
+            align-items: center;
             gap: 8px;
             flex-shrink: 0;
         }
@@ -143,16 +143,20 @@ $assignments = $stmt->fetchAll(PDO::FETCH_ASSOC);
             font-weight: 600;
         }
         .status-handed_in, .status-done {
-            background: #e8f5e9;
+            background: #c2dfc5ff;
             color: #2e7d32;
         }
-        .status-missing {
-            background: #880005;
-            color: white;
+        [data-theme="dark"] .status-handed_in, .status-done {
+            background: #152e17ff;
+            color: #9ae6abff;
         }
-        [data-theme="dark"] .status-missing {
+        .status-missing {
             background: #ffd7d7;
             color: #c62828;
+        }
+        [data-theme="dark"] .status-missing {
+            background: #461414ff;
+            color: #ffffffff;
         }
 
         .details-toggle {

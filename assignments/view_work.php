@@ -150,12 +150,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['mark_done']) || isse
             font-weight: 600;
         }
         .status-handed-in {
-            background: #fff3cd;
+            background: #f7e2a0ff;
             color: #856404;
         }
+        [data-theme="dark"] .status-handed-in {
+            background: #5a4302;
+            color: #ffdf78;
+        }
         .status-done {
-            background: #e8f5e9;
+            background: #c1f7c5ff;
             color: #2e7d32;
+        }
+        [data-theme="dark"] .status-done {
+            background: #104315;
+            color: #71c77bff;
         }
         .status-missing {
             background: #ffebee;
@@ -187,8 +195,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['mark_done']) || isse
             font-weight: 600;
             cursor: pointer;
         }
+        [data-theme="dark"] .mark-done-btn {
+            background: #173149;
+            color: white;
+        }
         .mark-done-btn:hover {
             background: #1765cc;
+        }
+        [data-theme="dark"] .mark-done-btn:hover {
+            background: #1e4060;
         }
         .mark-done-btn:disabled {
             background: #ccc;
@@ -234,6 +249,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['mark_done']) || isse
         [data-theme="dark"] .missing-list li {
             color: white;
         }
+        [data-theme="dark"] input[name="grade"] {
+            background: #000;
+            color: white;
+            border-color: #444;
+        }
+        .save-grade-btn {
+            padding: 6px 16px;
+            background: #5f6368;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        [data-theme="dark"] .save-grade-btn {
+            background: #17436bff;
+            color: white;
+        }
+        .save-grade-btn:hover {
+            background: #204775ff;
+        }
+        [data-theme="dark"] .save-grade-btn:hover {
+            background: #1e4a6e;
+        }
+        /* File attachment box */
+        .file-attachment-box {
+            margin-bottom: 12px;
+            padding: 10px 14px;
+            background: #f0f4f9;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        [data-theme="dark"] .file-attachment-box {
+            background: #173149;
+        }
     </style>
 </head>
 <body>
@@ -241,14 +294,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['mark_done']) || isse
         <?php include __DIR__ . '/../includes/sidebar.php'; ?>
         <main class="content">
             <?php include __DIR__ . '/../includes/navbar.php'; ?>   
-
-            <div class="container">
+            
                 <div style="padding: 20px 0; text-align: left;">
                     <a href="<?php echo BASE_URL; ?>/classes/classwork.php?class_id=<?php echo $class_id; ?>" style="display: inline-flex; align-items:center;gap:8px; text-decoration: none; color: var(--text); font-size: 14px; font-weight: 500; transition: opacity 0.2s;" class="back-link">
                         <img src="<?php echo BASE_URL; ?>/icons/goback.png" style="width:16px; height:16px; opacity:0.8;" alt="">
                         Back To Classwork
                     </a>
                 </div>
+            <div class="container">
+                
                 <div class="assignment-header">
                     <h1><?php echo htmlspecialchars($assignment['title']); ?></h1>
                     <div class="assignment-meta">
@@ -287,7 +341,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['mark_done']) || isse
                                 </div>
                                 <?php endif; ?>
                                 <?php if (!empty($sub['file_path'])): ?>
-                                <div style="margin-bottom: 12px; padding: 10px 14px; background: #f0f4f9; border-radius: 8px; display: flex; align-items: center; gap: 8px;">
+                                <div class="file-attachment-box">
                                     <span>&#128206;</span>
                                     <a href="<?php echo BASE_URL . '/' . htmlspecialchars($sub['file_path']); ?>" target="_blank" style="color: var(--primary); font-weight: 500; font-size: 13px;">
                                         <?php echo htmlspecialchars(basename($sub['file_path'])); ?>
@@ -302,11 +356,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['mark_done']) || isse
                                          </form>
                                      <?php endif; ?>
                                      
-                                     <form method="POST" style="display: inline-flex; align-items: center; gap: 8px;">
-                                         <input type="hidden" name="submission_id" value="<?php echo $sub['id']; ?>">
-                                         <input type="text" name="grade" value="<?php echo htmlspecialchars($sub['grade'] ?? ''); ?>" placeholder="Grade" style="width: 60px; padding: 5px; border: 1px solid var(--border); border-radius: 4px;">
-                                         <button type="submit" name="update_grade" class="mark-done-btn" style="background: #5f6368;">Save Grade</button>
-                                     </form>
+                                     <?php if (empty($sub['grade'])): ?>
+                                         <form method="POST" style="display: inline-flex; align-items: center; gap: 8px;">
+                                             <input type="hidden" name="submission_id" value="<?php echo $sub['id']; ?>">
+                                             <input type="text" name="grade" value="" placeholder="Grade" 
+                                             style="width: 60px; padding: 5px; border: 1px solid var(--border); border-radius: 4px;">
+                                             <button type="submit" name="update_grade" class="save-grade-btn">Save Grade</button>
+                                         </form>
+                                    <?php else: ?>
+                                        <span style="font-size: 13px; color: var(--muted);">Grade: <strong><?php echo htmlspecialchars($sub['grade']); ?></strong></span>
+                                    <?php endif; ?>
                                  </div>
                             </div>
                         <?php endforeach; ?>

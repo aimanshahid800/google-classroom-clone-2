@@ -25,6 +25,19 @@ $class = $stmt->fetch(PDO::FETCH_ASSOC);
 $stmt = $pdo->prepare('SELECT u.id, u.name, u.email, cm.role FROM class_members cm JOIN users u ON cm.user_id = u.id WHERE cm.class_id = ? ORDER BY cm.role DESC, u.name ASC');
 $stmt->execute([$class_id]);
 $members = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+function avatarColor($name) {
+    $colors = [
+        '#e53935', '#d81b60', '#8e24aa', '#5e35b1',
+        '#1e88e5', '#00897b', '#43a047', '#f4511e',
+        '#6d4c41', '#00acc1', '#3949ab', '#039be5'
+    ];
+    $hash = 0;
+    for ($i = 0; $i < strlen($name); $i++) {
+        $hash = ord($name[$i]) + (($hash << 5) - $hash);
+    }
+    return $colors[abs($hash) % count($colors)];
+}
 ?>
 
 <!DOCTYPE html>
@@ -35,27 +48,6 @@ $members = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <title>People | Classroom Clone</title>
     <link rel="stylesheet" href="../style.css">
     <style>
-        .class-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 40px 24px;
-            border-radius: 12px;
-            margin-bottom: 32px;
-        }
-        .class-header h1 {
-            margin: 0;
-            font-size: 32px;
-        }
-        .class-header p {
-            margin: 8px 0 0;
-            opacity: 0.9;
-        }
-        .class-meta {
-            display: flex;
-            gap: 24px;
-            margin-top: 16px;
-            font-size: 14px;
-        }
         .tabs {
             display: flex;
             gap: 24px;
@@ -71,9 +63,7 @@ $members = $stmt->fetchAll(PDO::FETCH_ASSOC);
             font-weight: 500;
             transition: all 0.2s;
         }
-        .tab:hover {
-            color: var(--text);
-        }
+        .tab:hover { color: var(--text); }
         .tab.active {
             color: var(--primary);
             border-bottom-color: var(--primary);
@@ -100,7 +90,6 @@ $members = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .member-avatar {
             width: 48px;
             height: 48px;
-            background: var(--primary);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -108,10 +97,9 @@ $members = $stmt->fetchAll(PDO::FETCH_ASSOC);
             color: white;
             font-weight: 600;
             font-size: 16px;
+            flex-shrink: 0;
         }
-        .member-info {
-            flex: 1;
-        }
+        .member-info { flex: 1; }
         .member-name {
             font-weight: 600;
             color: var(--text);
@@ -120,14 +108,6 @@ $members = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .member-email {
             font-size: 13px;
             color: var(--muted);
-        }
-        .member-role {
-            font-size: 12px;
-            padding: 4px 8px;
-            background: var(--surface-alt);
-            border-radius: 4px;
-            color: var(--primary);
-            font-weight: 600;
         }
     </style>
 </head>
@@ -149,39 +129,37 @@ $members = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 $students = array_filter($members, function($m) { return $m['role'] === 'student'; });
                 ?>
 
-                 <?php if (!empty($teachers)): ?>
-                     <div class="section-title">
-                         <img src="<?php echo BASE_URL; ?>/icons/teacher.png" style="width:18px; height:18px; vertical-align:middle; margin-right:8px;"> Teachers
-                     </div>
-                     <?php foreach ($teachers as $teacher): ?>
-                         <div class="member">
-                             <div class="member-avatar">
-                                 <?php echo strtoupper(substr($teacher['name'], 0, 1)); ?>
-                             </div>
-                             <div class="member-info">
-                                 <div class="member-name"><?php echo htmlspecialchars($teacher['name']); ?></div>
-                             </div>
-                         </div>
-                     <?php endforeach; ?>
-                 <?php endif; ?>
+                <?php if (!empty($teachers)): ?>
+                    <div class="section-title">
+                        <img src="<?php echo BASE_URL; ?>/icons/teacher.png" style="width:18px; height:18px; vertical-align:middle; margin-right:8px;"> Teachers
+                    </div>
+                    <?php foreach ($teachers as $teacher): ?>
+                        <div class="member">
+                            <div class="member-avatar" style="background: <?php echo avatarColor($teacher['name']); ?>">
+                                <?php echo strtoupper(substr($teacher['name'], 0, 1)); ?>
+                            </div>
+                            <div class="member-info">
+                                <div class="member-name"><?php echo htmlspecialchars($teacher['name']); ?></div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
 
-
-                 <?php if (!empty($students)): ?>
-                     <div class="section-title">
-                         <img src="<?php echo BASE_URL; ?>/icons/student.png" style="width:18px; height:18px; vertical-align:middle; margin-right:8px;"> Students
-                     </div>
-                     <?php foreach ($students as $student): ?>
-                         <div class="member">
-                             <div class="member-avatar">
-                                 <?php echo strtoupper(substr($student['name'], 0, 1)); ?>
-                             </div>
-                             <div class="member-info">
-                                 <div class="member-name"><?php echo htmlspecialchars($student['name']); ?></div>
-                             </div>
-                         </div>
-                     <?php endforeach; ?>
-                 <?php endif; ?>
-
+                <?php if (!empty($students)): ?>
+                    <div class="section-title">
+                        <img src="<?php echo BASE_URL; ?>/icons/student.png" style="width:18px; height:18px; vertical-align:middle; margin-right:8px;"> Students
+                    </div>
+                    <?php foreach ($students as $student): ?>
+                        <div class="member">
+                            <div class="member-avatar" style="background: <?php echo avatarColor($student['name']); ?>">
+                                <?php echo strtoupper(substr($student['name'], 0, 1)); ?>
+                            </div>
+                            <div class="member-info">
+                                <div class="member-name"><?php echo htmlspecialchars($student['name']); ?></div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
         </main>
     </div>

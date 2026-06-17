@@ -265,12 +265,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border-color: #8ab4f8;
         }
         .submitted-info {
-            background: #e8f5e9;
+            background: #d1e6c9ff;
             padding: 12px;
             border-radius: 8px;
             font-size: 13px;
-            color: #2e7d32;
+            color: #26932cff;
             margin-bottom: 20px;
+        }
+        [data-theme="dark"] .submitted-info {
+            background: #152e17ff;
+            color: #93f3a5ff;
         }
         .file-upload-area {
             border: 2px dashed var(--border);
@@ -324,6 +328,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background: #f0f4f9;
             border-radius: 8px;
             font-size: 13px;
+        }
+        [data-theme="dark"] .existing-file {
+            background: #173149;
+            color: #93f3a5ff;
         }
         .existing-file a {
             color: var(--primary);

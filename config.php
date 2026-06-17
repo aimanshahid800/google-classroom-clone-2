@@ -1,7 +1,7 @@
 <?php
 session_start();
  
-define('BASE_URL', '/Uni-Team-Project/google-classroom-clone-2');
+define('BASE_URL', '/google-classroom-clone-2');
  
 $dbHost = 'localhost';
 $dbName = 'classroom_clone';
